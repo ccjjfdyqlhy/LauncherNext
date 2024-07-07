@@ -1,6 +1,8 @@
 from internetDriver import *
 import sys
 import os
+import configparser
+from zipfile import ZipFile
 
 os.system('cls')
 try:
@@ -93,8 +95,36 @@ def main():
   print("下载完成。")
 
   if(CheckIfZip(chosenFile) == True):
-    print("正在应用更新。少安毋躁，这用不了太久。")
-    UnzipToLocation(chosenFile, dst, True)
+    print("正在读取更新信息...")
+    
+    # 读取更新信息
+    with ZipFile(chosenFile, 'r') as zip_file:
+      try:
+        with zip_file.open('update_info.ini') as config_file:
+          config = configparser.ConfigParser()
+          config.read_string(config_file.read().decode('utf-8'))
+
+          is_full_package = config.getint('UpdateInfo', 'is_full_package')
+          extract_path = config.get('UpdateInfo', 'extract_path')
+          files_to_delete = config.get('UpdateInfo', 'files_to_delete').split(',')
+      except KeyError:
+        print("更新信息文件格式错误或缺失必要信息。")
+        input('[Enter] 退出...')
+        os.system('cls')
+        quit()
+
+    print("正在应用更新...")
+    if is_full_package:
+      UnzipToLocation(chosenFile, dst, True)
+    else:
+      UnzipToLocation(chosenFile, os.path.join(dst, extract_path), True)
+
+    # 删除文件
+    for file_to_delete in files_to_delete:
+      file_path = os.path.join(dst, file_to_delete.strip())
+      if os.path.exists(file_path):
+        os.remove(file_path)
+
     print("完成。")
   else:
     print("没有检测到要应用的更新，遂跳过。")
