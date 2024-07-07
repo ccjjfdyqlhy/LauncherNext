@@ -15,6 +15,22 @@ config = configparser.ConfigParser()
 
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
+if os.path.exists('config.ini'):
+    config.read('config.ini')
+    forecolor = config.get('settings', 'forecolor')
+    bgcolor = config.get('settings', 'bgcolor')
+    ui.colors(primary=forecolor)
+    set_background(bgcolor)
+    print('[CONF] Configuration loaded.')
+else:
+    open('config.ini', 'w').close()
+    config['settings'] = {
+    "forecolor": '#5898D4',
+    "bgcolor": "#ffffff"
+    }
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+    print('[CONF] New configuration file created.')
 
 def set_fgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
@@ -22,30 +38,37 @@ def set_fgc(event: ValueChangeEventArguments):
         ui.colors(primary='#555')
         forecolor='#555'
         config.set('settings', 'forecolor', '#555')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Atlantic':
         ui.colors(primary='#3288AE')
         forecolor='#3288AE'
         config.set('settings', 'forecolor', '#3288AE')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Forest':
         ui.colors(primary='#346C48')
         forecolor='#346C48'
         config.set('settings', 'forecolor', '#346C48')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Deep Ocean':
         ui.colors(primary='#072A69')
         forecolor='#072A69'
         config.set('settings', 'forecolor', '#072A69')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
     else:
         ui.colors()
-        config.set('settings', 'forecolor', '#FFFFFF')
+        config.set('settings', 'forecolor', '#5898D4')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
 
 def set_bgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
     if f'{name}: {event.value}' == 'Radio: Orange':
         set_background('#ffeedd')
         config.set('settings', 'bgcolor', '#ffeedd')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
     else:
         set_background('#ffffff')
         config.set('settings', 'bgcolor', '#ffffff')
+        with open('config.ini', 'w') as configfile:config.write(configfile)
 
 
 with ui.header().classes(replace='row items-center') as header:
@@ -109,18 +132,5 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             fgcradio=ui.radio(['Defalt','Atlantic','Forest','Deep Ocean','Grey'],value='Defalt',on_change=set_fgc).props('inline')
             ui.label('背景色设置(Beta)')
             bgcradio=ui.radio(['Defalt','Orange'],value='Defalt',on_change=set_bgc).props('inline')
-
-if os.path.exists('config.ini'):
-    config.read('config.ini')
-    forecolor = config.get('settings', 'forecolor')
-    bgcolor = config.get('settings', 'bgcolor')
-    ui.colors(primary=forecolor)
-    set_background(bgcolor)
-def on_exit():
-    config.set('settings', 'forecolor', forecolor)
-    config.set('settings', 'bgcolor', bgcolor)
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-app.on_exit = on_exit
-
+    
 ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器')
