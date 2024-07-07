@@ -84,7 +84,6 @@ def main():
   chosenFile = AbsPathConstructor(linkFileNames[chosenInd], dst)
   print("更新包下载位置: " + chosenFile)
   print('\n')
-  #print("\nDownloading " + chosenFile + " from " + chosenUrl + "...")
   try:
     DownloadFile(chosenUrl, chosenFile)
   except KeyboardInterrupt:
