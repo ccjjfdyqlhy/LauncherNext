@@ -5,11 +5,12 @@ from nicegui.events import ValueChangeEventArguments
 
 __version__='0.0.3'
 forecolor='#FFFFFF'
+bgcolor='#ffffff'
+cwd=os.getcwd()
 app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
-app.add_static_files('/static', 'static')
+app.add_static_files('/static',cwd+'\\static')
 
-cwd=os.getcwd()
 game_name = 'MCSA Enchanted Light'
 config = configparser.ConfigParser()
 
@@ -19,6 +20,20 @@ if os.path.exists('config.ini'):
     config.read('config.ini')
     forecolor = config.get('settings', 'forecolor')
     bgcolor = config.get('settings', 'bgcolor')
+    if forecolor == '#555':
+        fgc_name='Grey'
+    elif forecolor == '#3288AE':
+        fgc_name='Atlantic'
+    elif forecolor == '#346C48':
+        fgc_name='Forest'
+    elif forecolor == '#072A69':
+        fgc_name='Deep Ocean'
+    else:
+        fgc_name='Defalt'
+    if bgcolor == '#ffeedd':
+        bgc_name='Orange'
+    else:
+        bgc_name='Defalt'
     ui.colors(primary=forecolor)
     set_background(bgcolor)
     print('[CONF] Configuration loaded.')
@@ -31,6 +46,8 @@ else:
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
     print('[CONF] New configuration file created.')
+    fgc_name='Defalt'
+    bgc_name='Defalt'
 
 def set_fgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
@@ -92,27 +109,17 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('启动面板'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
     with ui.tab_panel('产品库'):
-        with ui.row():
+        with ui.column():
             with ui.card():
-                ui.image('static/game_icon/MCSA.png')
-                with ui.card_section():
-                    ui.label('MCSA Enchanted')
+                ui.label('MCSA Enchanted')
             with ui.card():
-                ui.image('static/game_icon/genshin.png')
-                with ui.card_section():
-                    ui.label('原神')
+                ui.label('原神')
             with ui.card():
-                ui.image('static/game_icon/zzz.png')
-                with ui.card_section():
-                    ui.label('绝区零')
+                ui.label('绝区零')
             with ui.card():
-                ui.image('static/game_icon/star_rail.png')
-                with ui.card_section():
-                    ui.label('崩坏:星穹铁道')
+                ui.label('崩坏:星穹铁道')
             with ui.card():
-                ui.image('static/game_icon/honkai3.png')
-                with ui.card_section():
-                    ui.label('崩坏3')
+                ui.label('崩坏3')
     with ui.tab_panel('启动器设置'):
         with ui.card():
             ui.label('LauncherNext').style('color: #6E93D6; font-size: 200%; font-weight: 300')
@@ -125,12 +132,14 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                     ui.button('检查更新')
                     ui.button('许可与版权声明')
                     ui.button('在 Github 上查看此项目')
-        ui.label('\u00a0')
         with ui.card():
             ui.label('主题设置').style('font-size: 150%; font-weight: 300')
             ui.label('前景色设置')
-            fgcradio=ui.radio(['Defalt','Atlantic','Forest','Deep Ocean','Grey'],value='Defalt',on_change=set_fgc).props('inline')
+            fgcradio=ui.radio(['Defalt','Atlantic','Forest','Deep Ocean','Grey'],value=fgc_name,on_change=set_fgc).props('inline')
             ui.label('背景色设置(Beta)')
-            bgcradio=ui.radio(['Defalt','Orange'],value='Defalt',on_change=set_bgc).props('inline')
-    
-ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器')
+            bgcradio=ui.radio(['Defalt','Orange'],value=bgc_name,on_change=set_bgc).props('inline')
+        with ui.card():
+            ui.label('实例设置').style('font-size: 150%; font-weight: 300')
+            
+app.on_disconnect(app.shutdown)
+ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
