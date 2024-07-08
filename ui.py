@@ -10,44 +10,10 @@ cwd=os.getcwd()
 app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
 app.add_static_files('/static',cwd+'\\static')
-
-game_name = 'MCSA Enchanted Light'
 config = configparser.ConfigParser()
 
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
-if os.path.exists('config.ini'):
-    config.read('config.ini')
-    forecolor = config.get('settings', 'forecolor')
-    bgcolor = config.get('settings', 'bgcolor')
-    if forecolor == '#555':
-        fgc_name='Grey'
-    elif forecolor == '#3288AE':
-        fgc_name='Atlantic'
-    elif forecolor == '#346C48':
-        fgc_name='Forest'
-    elif forecolor == '#072A69':
-        fgc_name='Deep Ocean'
-    else:
-        fgc_name='Defalt'
-    if bgcolor == '#ffeedd':
-        bgc_name='Orange'
-    else:
-        bgc_name='Defalt'
-    ui.colors(primary=forecolor)
-    set_background(bgcolor)
-    print('[CONF] Configuration loaded.')
-else:
-    open('config.ini', 'w').close()
-    config['settings'] = {
-    "forecolor": '#5898D4',
-    "bgcolor": "#ffffff"
-    }
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-    print('[CONF] New configuration file created.')
-    fgc_name='Defalt'
-    bgc_name='Defalt'
 
 def set_fgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
@@ -87,6 +53,58 @@ def set_bgc(event: ValueChangeEventArguments):
         config.set('settings', 'bgcolor', '#ffffff')
         with open('config.ini', 'w') as configfile:config.write(configfile)
 
+def select_game(game):
+    print('[INFO] Game selected: '+game)
+    game_selected=game
+    config.set('games', 'game_selected', game)
+    with open('config.ini', 'w') as configfile:config.write(configfile)
+    launch_bt.props(remove='disabled')
+    launch_bt.set_text('启动 '+game)
+    gamelabel.set_text('选定项目: '+game_selected)
+
+if os.path.exists('config.ini'):
+    config.read('config.ini')
+    forecolor = config.get('settings', 'forecolor')
+    bgcolor = config.get('settings', 'bgcolor')
+    if forecolor == '#555':
+        fgc_name='Grey'
+    elif forecolor == '#3288AE':
+        fgc_name='Atlantic'
+    elif forecolor == '#346C48':
+        fgc_name='Forest'
+    elif forecolor == '#072A69':
+        fgc_name='Deep Ocean'
+    else:
+        fgc_name='Defalt'
+    if bgcolor == '#ffeedd':
+        bgc_name='Orange'
+    else:
+        bgc_name='Defalt'
+    ui.colors(primary=forecolor)
+    set_background(bgcolor)
+    game_list= config.get('games', 'game_list').split(',')
+    game_selected=config.get('games', 'game_selected')
+    print('[CONF] Configuration loaded.')
+else:
+    open('config.ini', 'w').close()
+    config['settings'] = {
+    "forecolor": '#5898D4',
+    "bgcolor": "#ffffff"
+    }
+    config['games'] = {
+    "game_list": 'MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact',
+    "game_selected": 'None'
+    }
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+    print('[CONF] New configuration file created.')
+    fgc_name='Defalt'
+    bgc_name='Defalt'
+    game_list='MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
+    game_selected='None'
+
+if game_selected == 'None':
+    game_selected = '未指定'
 
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():
@@ -103,23 +121,22 @@ with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     ui.label('没有正在进行的任务。').style('color: #3288AE;')
 
 with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
-    ui.button(text='启动 '+game_name)
+    if game_selected == '未指定':
+        launch_bt=ui.button('未指定启动项').props('disabled')
+    else:
+        launch_bt=ui.button(text='启动 '+game_selected)
 
 with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('启动面板'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
+        gamelabel=ui.label('选定项目: '+game_selected)
     with ui.tab_panel('产品库'):
         with ui.column():
-            with ui.card():
-                ui.label('MCSA Enchanted')
-            with ui.card():
-                ui.label('原神')
-            with ui.card():
-                ui.label('绝区零')
-            with ui.card():
-                ui.label('崩坏:星穹铁道')
-            with ui.card():
-                ui.label('崩坏3')
+            for game in game_list:
+                with ui.card():
+                    with ui.row():
+                        ui.label(game)
+                        ui.button('选定',on_click=lambda:select_game(game))
     with ui.tab_panel('启动器设置'):
         with ui.card():
             ui.label('LauncherNext').style('color: #6E93D6; font-size: 200%; font-weight: 300')
