@@ -83,6 +83,7 @@ if os.path.exists('config.ini'):
     ui.colors(primary=forecolor)
     set_background(bgcolor)
     game_list= config.get('games', 'game_list').split(',')
+    game_local= config.get('games', 'game_local').split(',')
     game_selected=config.get('games', 'game_selected')
     print('[CONF] Configuration loaded.')
 else:
@@ -93,6 +94,7 @@ else:
     }
     config['games'] = {
     "game_list": 'MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact',
+    "game_local": 'None',
     "game_selected": 'None'
     }
     with open('config.ini', 'w') as configfile:
@@ -101,6 +103,7 @@ else:
     fgc_name='Defalt'
     bgc_name='Defalt'
     game_list='MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
+    game_local='None'
     game_selected='None'
 
 if game_selected == 'None':
@@ -136,8 +139,8 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 with ui.card():
                     with ui.row():
                         ui.label(game)
-                        ui.button('选定',on_click=lambda:select_game(game))
     with ui.tab_panel('启动器设置'):
+        ui.label('这里的设置会自动保存。')
         with ui.card():
             ui.label('LauncherNext').style('color: #6E93D6; font-size: 200%; font-weight: 300')
             with ui.column():
@@ -149,6 +152,12 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                     ui.button('检查更新')
                     ui.button('许可与版权声明')
                     ui.button('在 Github 上查看此项目')
+        with ui.card():
+            with ui.column():
+                ui.label('账户').style('font-size: 150%; font-weight: 300')
+                ui.input('用户名')
+                ui.input('密码')
+                ui.button('登录')
         with ui.card():
             ui.label('主题设置').style('font-size: 150%; font-weight: 300')
             ui.label('前景色设置')

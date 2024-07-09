@@ -1,5 +1,7 @@
 *.pyc
 *.zip
 /download/*
+/test/*
+/.nicegui/*
 config.ini
 DSproduct.cfg

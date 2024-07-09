@@ -10,7 +10,7 @@ try:
     PRODUCT_NAME = f.read()
     f.close()
 except FileNotFoundError:
-  print('请放入产品配置文件。')
+  print('未检测到产品配置文件。')
   input('[Enter] 退出...')
   os.system('cls')
   quit()
