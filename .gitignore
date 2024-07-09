@@ -1,1 +1,5 @@
+*.pyc
+*.zip
+/download/*
 config.ini
+DSproduct.cfg
