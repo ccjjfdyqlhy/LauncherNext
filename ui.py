@@ -73,6 +73,7 @@ def select_game(game):
 
 if os.path.exists('lnxt.ini'):
     config.read('lnxt.ini')
+    launchtime = int(config.get('general', 'launch'))
     forecolor = config.get('settings', 'forecolor')
     bgcolor = config.get('settings', 'bgcolor')
     if forecolor == '#555':
@@ -96,8 +97,10 @@ if os.path.exists('lnxt.ini'):
     game_selected=config.get('games', 'game_selected')
     print('[CONF] Configuration loaded.')
 else:
-    firstlaunch=True
     open('lnxt.ini', 'w').close()
+    config['general'] = {
+    "launch": '1'
+    }
     config['settings'] = {
     "forecolor": '#5898D4',
     "bgcolor": "#ffffff"
@@ -115,15 +118,28 @@ else:
     game_list='MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
     game_local='None'
     game_selected='None'
+    launchtime = 1
 
 if game_selected == 'None':
     game_selected = '未指定'
 
-if firstlaunch:
+if launchtime <= 2:
     print('[INFO] First launch detected.')
     with ui.dialog() as dialog, ui.card():
-        ui.label('Hello world!')
-        ui.button('Close', on_click=dialog.close)
+        ui.label('欢迎!').style('color: #6E93D6; font-size: 200%; font-weight: 300')
+        ui.label('LauncherNext 是一个基于 webUI 设计的轻量级应用启动器。')
+        ui.label('只需要简单几步，我们就可以完成对启动器的初始化设置。')
+        ui.label('单击"下一步"以继续。')
+        with ui.row():
+            ui.button('继续')
+            ui.button('跳过', on_click=dialog.close)
+    dialog.open()
+launchtime = launchtime + 1
+config['general'] = {
+    "launch": launchtime
+    }
+with open('lnxt.ini', 'w') as configfile:
+    config.write(configfile)
 
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():
@@ -165,7 +181,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             with ui.column():
                 ui.label('一个基于webUI和Python的轻量级启动器。')
                 ui.label('当前版本：'+__version__)
-                ui.label('由 DarkstarXD 独立开发。')
+                ui.label('由 DarkstarXD 和 Allen546 联合开发。')
                 ui.separator()
                 with ui.row():
                     ui.button('检查更新')
@@ -174,8 +190,8 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
         with ui.card():
             with ui.column():
                 ui.label('账户').style('font-size: 150%; font-weight: 300')
-                ui.input('用户名')
-                ui.input('密码')
+                username = ui.input('用户名')
+                password = ui.input('密码', password=True, password_toggle_button=True)
                 ui.button('登录')
         with ui.card():
             ui.label('主题设置').style('font-size: 150%; font-weight: 300')
