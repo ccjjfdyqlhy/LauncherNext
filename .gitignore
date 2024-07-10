@@ -1,8 +1,8 @@
 *.pyc
 *.zip
-/download/*
+/downloads/*
 /test/*
 /.nicegui/*
-config.ini
+lnxt.ini
 DSproduct.cfg
 .venv/*
