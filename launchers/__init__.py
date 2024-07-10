@@ -5,7 +5,7 @@ launchers = {
 }
 
 class Launcher(abc.ABC):
-    @abs.abstractmethod
+    @abc.abstractmethod
     def launch(self, *args, **kwargs):
         "Launch the game"
         raise NotImplemented
