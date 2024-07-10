@@ -1,2 +1,2 @@
 # LauncherNext
-一个webUI式的轻量级Minecraft启动器-Reborn
+一个webUI式的轻量级应用启动器
