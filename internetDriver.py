@@ -11,7 +11,7 @@ def GetJsonData(url, username = None):
   if(username):
     response = requests.get(url, auth = (username,'token'))
   else:
-    response = requests.get(url)
+    response = requests.get(url,verify=False)
   loaded = json.loads(response.text)
   return loaded
 

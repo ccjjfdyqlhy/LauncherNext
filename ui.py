@@ -135,7 +135,8 @@ if launchtime <= 2:
             ui.button('下一步')
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
-    launchers.mc_java.MCLauncher.install_cmcl()
+    if launchtime == 2:
+        launchers.mc_java.MCLauncher.install_cmcl()
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
