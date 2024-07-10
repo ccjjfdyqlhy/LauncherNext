@@ -2,6 +2,7 @@ from . import Launcher
 import os
 import os.path
 import platform
+import dmglib
 from internetDriver import *
 
 class MCLauncher(Launcher):
@@ -24,8 +25,9 @@ class JavaManager():
     @classmethod
     def install_java_windows(cls, version):
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
-        DownloadFile(f"https://download.oracle.com/java/{version}/latest/jdk-{version}_windows-x64_bin.exe", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_windows-x64_bin.exe"))
-        os.system("start "+os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_windows-x64_bin.exe"))
+        CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java"))
+        DownloadFile(f"https://download.oracle.com/java/{version}/latest/jdk-{version}_windows-x64_bin.exe", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_windows-x64_bin.exe"))
+        os.system("start "+os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_windows-x64_bin.exe"))
 
     @classmethod
     def install_java_macos(cls, version):
@@ -37,7 +39,23 @@ class JavaManager():
             url = f"https://download.oracle.com/java/{version}/latest/jdk-{version}_macos-x64_bin.dmg"
 
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
-        DownloadFile(url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_macos_bin.dmg"))
+        CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java"))
+        path = os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_macos_bin.dmg")
+        DownloadFile(url, path)
+        print("[INFO] 请手动安装Java：双击Java安装器")
+        import subprocess
+        subprocess.Popen(["open", path])
+
+    def install_java(cls, version="17"):
+        if platform.system() == "Darwin": #on MacOS
+            cls.install_java_macos(version)
+        elif platform.system() == "Windows": # on Windows
+            cls.install_java_windows(version)
+        else: #on Linux
+            raise NotImplementedError("Not implemented yet")
+
+
+        
         #unfinished
 
 
