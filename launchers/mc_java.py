@@ -4,13 +4,18 @@ import os.path
 import platform
 from internetDriver import *
 
-CMCL_DOWNLOAD_URL = "https://github.com/MrShieh-X/console-minecraft-launcher/releases/download//cmcl.jar"
-
 class MCLauncher(Launcher):
     @classmethod
     def install_cmcl(cls):
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
-        DownloadFile(RetrieveDownloadLinks("MrShieh-X", "console-minecraft-launcher"), os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
+        all_links = RetrieveDownloadLinks("MrShieh-X", "console-minecraft-launcher")
+        for link in all_links:
+            if link.endswith("jar"):
+                url = link
+                break
+        else:
+            assert False, "This shouldn't happen: no jar version of cmcl"
+        DownloadFile(url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
     @classmethod
     def launch(cls):
         pass
