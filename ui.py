@@ -1,6 +1,7 @@
 import os
 import os.path
 import configparser
+import copy
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
 from utils import download
@@ -14,6 +15,11 @@ app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
 app.add_static_files('/static',os.path.join(cwd, "static"))  # Use os.path.join instead of "+"
 config = configparser.ConfigParser()
+
+class GameCard(ui.card):
+    def set_game_name(self, game):
+        self._game_name = copy.deepcopy(game)
+        self.on("click", lambda: gamelabel.set_text('选定项目: '+self._game_name))
 
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
@@ -146,9 +152,12 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('产品库'):
         with ui.column():
             for game in game_list:
-                with ui.card():
+                with GameCard() as card:
+                    card.set_game_name(game)
                     with ui.row():
-                        ui.label(game)
+                        onclick = lambda: gamelabel.set_text('选定项目: '+game)
+                        l = ui.label(game)
+
     with ui.tab_panel('启动器设置'):
         ui.label('这里的设置会自动保存。')
         with ui.card():
