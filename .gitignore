@@ -5,3 +5,4 @@
 /.nicegui/*
 config.ini
 DSproduct.cfg
+.venv/*
