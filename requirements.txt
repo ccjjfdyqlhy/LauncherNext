@@ -9,7 +9,6 @@ bottle==0.12.25
 certifi==2024.7.4
 charset-normalizer==3.3.2
 click==8.1.7
-dmglib==0.9.5
 docutils==0.19
 fastapi==0.109.2
 frozenlist==1.4.1
