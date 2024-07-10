@@ -3,6 +3,7 @@ import os.path
 import configparser
 import copy
 import webbrowser
+import launchers.mc_java
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
 
@@ -131,9 +132,10 @@ if launchtime <= 2:
         ui.label('只需要简单几步，我们就可以完成对启动器的初始化设置。')
         ui.label('单击"下一步"以继续。')
         with ui.row():
-            ui.button('继续')
+            ui.button('下一步')
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
+launchers.mc_java.MCLauncher.install_cmcl()
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
