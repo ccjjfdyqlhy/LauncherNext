@@ -39,6 +39,7 @@ class JavaManager():
             url = f"https://download.oracle.com/java/{version}/latest/jdk-{version}_macos-x64_bin.dmg"
 
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
+        CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java"))
         path = os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_macos_bin.dmg")
         DownloadFile(url, path)
         print("[INFO] 请手动安装Java：双击Java安装器")
