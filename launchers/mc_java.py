@@ -44,7 +44,7 @@ class JavaManager():
         print("[INFO] 请手动安装Java：双击Java安装器")
         import subprocess
         subprocess.Popen(["open", path])
-
+    @classmethod
     def install_java(cls, version="17"):
         if platform.system() == "Darwin": #on MacOS
             cls.install_java_macos(version)
