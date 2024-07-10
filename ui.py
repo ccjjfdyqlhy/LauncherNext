@@ -4,7 +4,6 @@ import configparser
 import copy
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
-from utils import download
 
 __version__='0.0.3'
 forecolor='#FFFFFF'

@@ -1,6 +1,6 @@
 *.pyc
 *.zip
-/download/*
+/downloads/*
 /test/*
 /.nicegui/*
 lnxt.ini
