@@ -1,4 +1,5 @@
 import os
+import os.path
 import configparser
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
@@ -9,7 +10,7 @@ bgcolor='#ffffff'
 cwd=os.getcwd()
 app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
-app.add_static_files('/static',cwd+'\\static')
+app.add_static_files('/static',os.path.join(cwd, "static"))  # Use os.path.join instead of "+"
 config = configparser.ConfigParser()
 
 def set_background(color: str) -> None:
