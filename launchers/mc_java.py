@@ -2,7 +2,6 @@ from . import Launcher
 import os
 import os.path
 import platform
-import dmglib
 from internetDriver import *
 
 class MCLauncher(Launcher):
