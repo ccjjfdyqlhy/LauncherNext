@@ -46,6 +46,14 @@ class JavaManager():
         import subprocess
         subprocess.Popen(["open", path])
 
+    def install_java(cls, version="17"):
+        if platform.system() == "Darwin": #on MacOS
+            cls.install_java_macos(version)
+        elif platform.system() == "Windows" # on Windows
+            cls.install_java_windows(version)
+        else: #on Linux
+            raise NotImplementedError("Not implemented yet")
+
 
         
         #unfinished
