@@ -25,7 +25,7 @@ class JavaManager():
     def install_java_windows(cls, version):
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
         DownloadFile(f"https://download.oracle.com/java/{version}/latest/jdk-{version}_windows-x64_bin.exe", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_windows-x64_bin.exe"))
-        os.start(os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_windows-x64_bin.exe"))
+        os.system("start "+os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_windows-x64_bin.exe"))
 
     @classmethod
     def install_java_macos(cls, version):

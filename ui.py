@@ -204,6 +204,9 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             bgcradio=ui.radio(['Defalt','Orange'],value=bgc_name,on_change=set_bgc).props('inline')
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
-            
+            with ui.row():
+                javaverin=ui.input('Java 版本')
+                ui.button('下载Java',on_click=lambda:launchers.mc_java.JavaManager.install_java_windows(javaverin.value))
+
 app.on_disconnect(app.shutdown)
 ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
