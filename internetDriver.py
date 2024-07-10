@@ -49,19 +49,22 @@ def AbsPathConstructor(fileName, dst):
   return dst+fileName
 
 def DownloadFile(url, fileName):
-  fileObject = requests.get(url,stream=True)
-  total = int(fileObject.headers.get('content-length', 0))
-  with open(fileName, 'wb') as localFile, tqdm(
-    desc=fileName,
-    total=total,
-    unit='iB',
-    unit_scale=True,
-    unit_divisor=1024,
-    ) as bar:
-    bar.set_description('下载更新包')
-    for data in fileObject.iter_content(chunk_size=1024):
-      size = localFile.write(data)
-      bar.update(size)
+  try:
+    fileObject = requests.get(url,stream=True)
+    total = int(fileObject.headers.get('content-length', 0))
+    with open(fileName, 'wb') as localFile, tqdm(
+      desc=fileName,
+      total=total,
+      unit='iB',
+      unit_scale=True,
+      unit_divisor=1024,
+      ) as bar:
+      bar.set_description('LauncherNext 内容下载')
+      for data in fileObject.iter_content(chunk_size=1024):
+        size = localFile.write(data)
+        bar.update(size)
+  except requests.exceptions.ConnectTimeout:
+    print('[DWNL] 下载失败，连接超时。')
 
 def UnzipToLocation(src, dst, deleteSrc = False):
   with zipfile.ZipFile(src, 'r') as zip_ref:
