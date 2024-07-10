@@ -206,7 +206,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
             with ui.row():
                 javaverin=ui.input('Java 版本')
-                ui.button('下载Java',on_click=lambda:launchers.mc_java.JavaManager.install_java_windows(javaverin.value))
+                ui.button('下载Java',on_click=lambda:launchers.mc_java.JavaManager.install_java(javaverin.value))
 
 app.on_disconnect(app.shutdown)
 ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
