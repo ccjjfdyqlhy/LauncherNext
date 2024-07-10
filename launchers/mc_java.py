@@ -4,13 +4,13 @@ import os.path
 import platform
 from internetDriver import *
 
-CMCL_DOWNLOAD_URL = "https://github.com/MrShieh-X/console-minecraft-launcher/releases/download/latest/cmcl.jar"
+CMCL_DOWNLOAD_URL = "https://github.com/MrShieh-X/console-minecraft-launcher/releases/download//cmcl.jar"
 
 class MCLauncher(Launcher):
     @classmethod
     def install_cmcl(cls):
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
-        DownloadFile(CMCL_DOWNLOAD_URL, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
+        DownloadFile(RetrieveDownloadLinks("MrShieh-X", "console-minecraft-launcher"), os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
     @classmethod
     def launch(cls):
         pass
@@ -33,5 +33,6 @@ class JavaManager():
 
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
         DownloadFile(url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", f"jdk-{version}_macos_bin.dmg"))
+        #unfinished
 
 
