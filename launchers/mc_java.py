@@ -4,7 +4,7 @@ import os.path
 import platform
 from internetDriver import *
 
-CMCL_DOWNLOAD_URL = "https://github.com/MrShieh-X/console-minecraft-launcher/releases/download/latest/cmcl.jar"
+CMCL_DOWNLOAD_URL = "https://mirror.ghproxy.com/https://github.com/MrShieh-X/console-minecraft-launcher/releases/download/latest/cmcl.jar"
 
 class MCLauncher(Launcher):
     @classmethod
