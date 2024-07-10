@@ -3,10 +3,12 @@ import os.path
 import configparser
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
+from utils import download
 
 __version__='0.0.3'
 forecolor='#FFFFFF'
 bgcolor='#ffffff'
+firstlaunch=False
 cwd=os.getcwd()
 app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
@@ -22,49 +24,49 @@ def set_fgc(event: ValueChangeEventArguments):
         ui.colors(primary='#555')
         forecolor='#555'
         config.set('settings', 'forecolor', '#555')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Atlantic':
         ui.colors(primary='#3288AE')
         forecolor='#3288AE'
         config.set('settings', 'forecolor', '#3288AE')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Forest':
         ui.colors(primary='#346C48')
         forecolor='#346C48'
         config.set('settings', 'forecolor', '#346C48')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Deep Ocean':
         ui.colors(primary='#072A69')
         forecolor='#072A69'
         config.set('settings', 'forecolor', '#072A69')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     else:
         ui.colors()
         config.set('settings', 'forecolor', '#5898D4')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
 
 def set_bgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
     if f'{name}: {event.value}' == 'Radio: Orange':
         set_background('#ffeedd')
         config.set('settings', 'bgcolor', '#ffeedd')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     else:
         set_background('#ffffff')
         config.set('settings', 'bgcolor', '#ffffff')
-        with open('config.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
 
 def select_game(game):
     print('[INFO] Game selected: '+game)
     game_selected=game
     config.set('games', 'game_selected', game)
-    with open('config.ini', 'w') as configfile:config.write(configfile)
+    with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     launch_bt.props(remove='disabled')
     launch_bt.set_text('启动 '+game)
     gamelabel.set_text('选定项目: '+game_selected)
 
-if os.path.exists('config.ini'):
-    config.read('config.ini')
+if os.path.exists('lnxt.ini'):
+    config.read('lnxt.ini')
     forecolor = config.get('settings', 'forecolor')
     bgcolor = config.get('settings', 'bgcolor')
     if forecolor == '#555':
@@ -88,7 +90,8 @@ if os.path.exists('config.ini'):
     game_selected=config.get('games', 'game_selected')
     print('[CONF] Configuration loaded.')
 else:
-    open('config.ini', 'w').close()
+    firstlaunch=True
+    open('lnxt.ini', 'w').close()
     config['settings'] = {
     "forecolor": '#5898D4',
     "bgcolor": "#ffffff"
@@ -98,7 +101,7 @@ else:
     "game_local": 'None',
     "game_selected": 'None'
     }
-    with open('config.ini', 'w') as configfile:
+    with open('lnxt.ini', 'w') as configfile:
         config.write(configfile)
     print('[CONF] New configuration file created.')
     fgc_name='Defalt'
@@ -109,6 +112,12 @@ else:
 
 if game_selected == 'None':
     game_selected = '未指定'
+
+if firstlaunch:
+    print('[INFO] First launch detected.')
+    with ui.dialog() as dialog, ui.card():
+        ui.label('Hello world!')
+        ui.button('Close', on_click=dialog.close)
 
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():
