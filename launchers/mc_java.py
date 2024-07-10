@@ -25,17 +25,17 @@ class JavaManager():
     def install_java_windows(cls, version):
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java"))
-        DownloadFile(f"https://download.oracle.com/java/{version}/latest/jdk-{version}_windows-x64_bin.exe", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_windows-x64_bin.exe"))
+        DownloadFile(f"https://download.oracle.com/java/{version}/archive/jdk-{version}_windows-x64_bin.exe", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_windows-x64_bin.exe"))
         os.system("start "+os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java", f"jdk-{version}_windows-x64_bin.exe"))
 
     @classmethod
     def install_java_macos(cls, version):
         if platform.machine == "arm64":
             # runnning on arm64
-            url = f"https://download.oracle.com/java/{version}/latest/jdk-{version}_macos-aarch64_bin.dmg"
+            url = f"https://download.oracle.com/java/{version}/archive/jdk-{version}_macos-aarch64_bin.dmg"
         else:
             # running on x64
-            url = f"https://download.oracle.com/java/{version}/latest/jdk-{version}_macos-x64_bin.dmg"
+            url = f"https://download.oracle.com/java/{version}/archive/jdk-{version}_macos-x64_bin.dmg"
 
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "java"))
