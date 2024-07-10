@@ -2,6 +2,7 @@ import os
 import os.path
 import configparser
 import copy
+import threading
 import webbrowser
 import launchers.mc_java
 from nicegui import ui,app
@@ -206,7 +207,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
             with ui.row():
                 javaverin=ui.input('Java 版本')
-                ui.button('下载Java',on_click=lambda:launchers.mc_java.JavaManager.install_java(javaverin.value))
+                ui.button('下载Java',on_click=lambda:threading.Thread(target=launchers.mc_java.JavaManager.install_java, args=[javaverin.value]).start())
 
 app.on_disconnect(app.shutdown)
 ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
