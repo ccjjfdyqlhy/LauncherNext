@@ -2,6 +2,7 @@ import os
 import os.path
 import configparser
 import copy
+import webbrowser
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
 
@@ -183,9 +184,9 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 ui.label('由 DarkstarXD 和 Allen546 联合开发。')
                 ui.separator()
                 with ui.row():
-                    ui.button('检查更新')
-                    ui.button('许可与版权声明')
-                    ui.button('在 Github 上查看此项目')
+                    ui.button('检查更新').props('disabled')
+                    ui.button('许可与版权声明',on_click=lambda:webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext/blob/main/LICENSE'))
+                    ui.button('在 Github 上查看此项目',on_click=lambda:webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext'))
         with ui.card():
             with ui.column():
                 ui.label('账户').style('font-size: 150%; font-weight: 300')
