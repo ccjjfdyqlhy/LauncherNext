@@ -15,7 +15,7 @@ class MCLauncher(Launcher):
                 break
         else:
             assert False, "This shouldn't happen: no jar version of cmcl"
-        DownloadFile(url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
+        DownloadFile("https://mirror.ghproxy.com/"+url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
     @classmethod
     def launch(cls):
         pass
