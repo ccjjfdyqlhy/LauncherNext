@@ -5,6 +5,67 @@ import platform
 from internetDriver import *
 
 class MCLauncher(Launcher):
+    JVM_ARGS = {}
+
+    @classmethod
+    def add_jvm_arg(cls, arg, val):
+        cls.JVM_ARGS[arg] = val
+
+    @classmethod
+    def set_jvm_memory_allocation(cls, min_memory="8G", max_memory="8G"):
+        cls.JVM_ARGS["Xmx"] = max_memory
+        cls.JVM_ARGS["Xms"] = min_memory
+
+    @classmethod
+    def reset_jvm_flags(cls):
+        cls.JVM_ARGS = {"Xmx": "8G", "Xms": "8G", 
+                        "XX:+UnlockExperimentalVMOptions": "", 
+                        "XX:+UnlockDiagnosticVMOptions":"",
+                        "XX:+AlwaysPreTouch":"",
+                        "XX:+DisableExplicitGC":"", 
+                        "XX:+UseNUMA":"",
+                        "XX:NmethodSweepActivity=":"1",
+                        "XX:ReservedCodeCacheSize=":"400M",
+                        "XX:NonNMethodCodeHeapSize=":"12M",
+                        "XX:ProfiledCodeHeapSize=":"194M",
+                        "XX:NonProfiledCodeHeapSize=":"194M",
+                        "XX:-DontCompileHugeMethods":"",
+                        "XX:MaxNodeLimit=":"240000",
+                        "XX:NodeLimitFudgeFactor=":"8000",
+                        "XX:+UseVectorCmov":"",
+                        "XX:+PerfDisableSharedMem":"",
+                        "XX:+UseFastUnorderedTimeStamps":"",
+                        "XX:+UseCriticalJavaThreadPriority":"",
+                        "XX:ThreadPriorityPolicy=":"1",
+                        "XX:AllocatePrefetchStyle=":"3",
+                        "XX:+UseG1GC":"",
+                        "XX:MaxGCPauseMillis=":"37",
+                        "XX:+PerfDisableSharedMem":"",
+                        "XX:G1HeapRegionSize=":"16M",
+                        "XX:G1NewSizePercent=":"23",
+                        "XX:G1ReservePercent=":"20",
+                        "XX:SurvivorRatio=":"32",
+                        "XX:G1MixedGCCountTarget=":"3",
+                        "XX:G1HeapWastePercent=":"20",
+                        "XX:InitiatingHeapOccupancyPercent=":"10",
+                        "XX:G1RSetUpdatingPauseTimePercent=":"0",
+                        "XX:MaxTenuringThreshold=":"1",
+                        "XX:G1SATBBufferEnqueueingThresholdPercent=":"30",
+                        "XX:G1ConcMarkStepDurationMillis=":"5.0",
+                        "XX:G1ConcRSHotCardLimit=":"16",
+                        "XX:G1ConcRefinementServiceIntervalMillis=":"150",
+                        "XX:GCTimeRatio=":"99",
+                        "XX:+UseLargePages":"",
+                        "XX:LargePageSizeInBytes=":"2m",
+                        }
+
+    @classmethod
+    def gen_jvm_args(cls):
+        jvm_args = []
+        for arg, val in cls.JVM_ARGS.items():
+            jvm_args.append("-" + arg + val)
+        return jvm_args
+
     @classmethod
     def install_cmcl(cls):
         CreateDirIfInvalid(os.path.join(os.getcwd(), "downloads", "Minecraft_Java"))
