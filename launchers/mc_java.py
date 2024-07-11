@@ -1,5 +1,6 @@
 from . import Launcher
 import subprocess
+import tempfile
 import os
 import os.path
 import platform
@@ -9,7 +10,7 @@ class MCLauncher(Launcher):
     JVM_ARGS = {}
 
     @classmethod
-    def add_jvm_arg(cls, arg, val):
+    def _add_jvm_arg(cls, arg, val):
         cls.JVM_ARGS[arg] = val
 
     @classmethod
@@ -82,16 +83,51 @@ class MCLauncher(Launcher):
     @classmethod
     def install_minecraft(cls, version):
         cmcl_args = ["install", version]
-        cls._execute_cmcl_command(cmcl_args)
+        out_gen = cls._execute_cmcl_command(cmcl_args)
+        while True:
+            print(next(out_gen))
 
     @classmethod
-    def _execute_cmcl_command(cls, cmcl_args):
-        subprocess.Popen(["java", "-jar", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar")] + cmcl_args, 
-                         cwd=os.path.join(os.getcwd(), "downloads"))
+    def _launch_mc(cls, version):
+        cmcl_args = [version,]
+        out_gen = cls._execute_cmcl_command(cmcl_args)
+        while True:
+            print(next(out_gen))
 
     @classmethod
-    def launch(cls):
-        pass
+    def _load_jvm_args(cls):
+        t = cls._execute_cmcl_command(["jvmArgs", "--print"])
+        out = next(t)
+        nargs = len(eval(out))
+        for _ in range(nargs):
+            cls._execute_cmcl_command(["jvmArgs", "--delete=0"], output=False)
+        
+        for arg in cls.gen_jvm_args():
+            cls._execute_cmcl_command(["jvmArgs", "--add="+arg], output=False)
+
+    @classmethod
+    def _execute_cmcl_command(cls, cmcl_args, output=True):
+        p = subprocess.Popen(["java", "-jar", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar")] + cmcl_args, 
+                         cwd=os.path.join(os.getcwd(), "downloads", "Minecraft_Java"), stdout=subprocess.PIPE)
+        
+        if not output:
+            return p
+        
+        while True:
+            output = p.stdout.readline()
+            if output == '' and p.poll() is not None:
+                break
+            if output:
+                yield output
+        rc = p.poll()
+        return rc
+
+
+    @classmethod
+    def launch(cls, version):
+        cls._load_jvm_args()
+        cls._launch_mc(version)
+        
 
 class JavaManager():
     versions = {
