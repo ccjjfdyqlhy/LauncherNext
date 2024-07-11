@@ -1,4 +1,5 @@
 from . import Launcher
+import subprocess
 import os
 import os.path
 import platform
@@ -77,6 +78,17 @@ class MCLauncher(Launcher):
         else:
             assert False, "This shouldn't happen: no jar version of cmcl"
         DownloadFile("https://mirror.ghproxy.com/"+url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
+
+    @classmethod
+    def install_minecraft(cls, version):
+        cmcl_args = ["install", version]
+        cls._execute_cmcl_command(cmcl_args)
+
+    @classmethod
+    def _execute_cmcl_command(cls, cmcl_args):
+        subprocess.Popen(["java", "-jar", os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar")] + cmcl_args, 
+                         cwd=os.path.join(os.getcwd(), "downloads"))
+
     @classmethod
     def launch(cls):
         pass
