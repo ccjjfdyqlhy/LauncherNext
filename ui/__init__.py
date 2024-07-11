@@ -137,7 +137,11 @@ if launchtime <= 2:
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
     if launchtime == 2:
-        launchers.mc_java.MCLauncher.install_cmcl()
+        try:
+            launchers.mc_java.MCLauncher.install_cmcl()
+        except KeyboardInterrupt:
+            print('[DWNL] 必要的下载被取消。')
+            quit()
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
@@ -215,4 +219,4 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
 app.on_disconnect(app.shutdown)
 
 def main():
-    ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=True)
+    ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
