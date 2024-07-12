@@ -205,23 +205,24 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
 
     with ui.tab_panel('启动器设置'):
         ui.label('这里的设置会自动保存。')
-        with ui.card():
-            ui.label('LauncherNext').style('color: #6E93D6; font-size: 200%; font-weight: 300')
-            with ui.column():
-                ui.label('一个基于webUI和Python的轻量级启动器。')
-                ui.label('当前版本：'+__version__)
-                ui.label('由 DarkstarXD 和 Allen546 联合开发。')
-                ui.separator()
-                with ui.row():
-                    ui.button('检查更新').props('disabled')
-                    ui.button('许可与版权声明',on_click=lambda:webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext/blob/main/LICENSE'))
-                    ui.button('在 Github 上查看此项目',on_click=lambda:webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext'))
-        with ui.card():
-            with ui.column():
-                ui.label('账户').style('font-size: 150%; font-weight: 300')
-                username = ui.input('用户名')
-                password = ui.input('密码', password=True, password_toggle_button=True)
-                ui.button('登录')
+        with ui.row():
+            with ui.card():
+                ui.label('LauncherNext').style('color: #6E93D6; font-size: 200%; font-weight: 300')
+                with ui.column():
+                    ui.label('一个基于webUI和Python的轻量级启动器。')
+                    ui.label('当前版本：'+__version__)
+                    ui.label('由 DarkstarXD 和 Allen546 联合开发。')
+                    ui.separator()
+                    with ui.row():
+                        ui.button('检查更新').props('disabled')
+                        ui.button('许可与版权声明',on_click=lambda:webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext/blob/main/LICENSE'))
+                        ui.button('在 Github 上查看此项目',on_click=lambda:webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext'))
+            with ui.card():
+                with ui.column():
+                    ui.label('账户').style('font-size: 150%; font-weight: 300')
+                    username = ui.input('用户名')
+                    password = ui.input('密码', password=True, password_toggle_button=True)
+                    ui.button('登录')
         with ui.card():
             ui.label('主题设置').style('font-size: 150%; font-weight: 300')
             ui.label('前景色设置')
@@ -232,13 +233,13 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
             ui.label('Minecraft').style('font-size: 125%')
             with ui.row():
-                ui.label("安装Java").style('margin-top:13px;')
+                ui.label("安装Java: ").style('margin-top:13px;')
                 javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17").style("margin-bottom: 15px;padding-right: 10px")
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
+                ui.label("Java策略: ").style('margin-top:13px;')
+                javarole=ui.select(['自动根据Minecraft版本选择Java','17','11','8'], value="自动根据Minecraft版本选择Java").style("margin-bottom: 15px;padding-right: 10px")
             with ui.row():
-                with ui.column():
-                    ui.label("JVM内存分配").style('margin-top:13px;')
-                    ui.label('总内存 '+str(mtotal)+' GB, 当前使用 '+str(mused)+' GB, 可用 '+str(mfree)+' GB')
+                ui.label("JVM内存分配: "+'总内存 '+str(mtotal)+' GB, 当前使用 '+str(mused)+' GB, 可用 '+str(mfree)+' GB').style('margin-top:13px;')
                 slider = ui.slider(min=2, max=mtotal, step=0.5, value=6)
                 ui.number().bind_value(slider)
                 ui.label('GB')
