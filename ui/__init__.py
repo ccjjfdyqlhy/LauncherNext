@@ -40,7 +40,7 @@ class LogElementHandler(logging.Handler):
 class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
-        self.on("click", lambda: gamelabel.set_text('选定项目: '+self._game_name))
+        self.on("click", lambda: select_game(self._game_name))
 
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
@@ -183,12 +183,6 @@ with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     handler = LogElementHandler(log)
     logger.addHandler(handler)
 
-with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
-    if game_selected == '未指定':
-        launch_bt=ui.button('未指定启动项').props('disabled')
-    else:
-        launch_bt=ui.button(text='启动 '+game_selected)
-
 with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('启动面板'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
@@ -235,6 +229,12 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17")
                 javaverin.style("margin-bottom: 15px;padding-right: 10px")
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
+
+with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
+    if game_selected == '未指定':
+        launch_bt=ui.button('未指定启动项').props('disabled')
+    else:
+        launch_bt=ui.button(text='启动 '+game_selected)
 
 app.on_disconnect(app.shutdown)
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
