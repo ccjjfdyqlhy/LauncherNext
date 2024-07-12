@@ -5,6 +5,7 @@ import copy
 from .installers import *
 import webbrowser
 import launchers.mc_java
+import utils.fastgithub_launcher as fg_launcher
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
 
@@ -125,7 +126,7 @@ else:
 if game_selected == 'None':
     game_selected = '未指定'
 
-if launchtime <= 2:
+if launchtime < 2:
     print('[INFO] First launch detected.')
     with ui.dialog() as dialog, ui.card():
         ui.label('欢迎!').style('color: #6E93D6; font-size: 200%; font-weight: 300')
@@ -136,12 +137,7 @@ if launchtime <= 2:
             ui.button('下一步')
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
-    if launchtime == 2:
-        try:
-            launchers.mc_java.MCLauncher.install_cmcl()
-        except KeyboardInterrupt:
-            print('[DWNL] 必要的下载被取消。')
-            quit()
+    fg_launcher.install()
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
@@ -219,4 +215,5 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
 app.on_disconnect(app.shutdown)
 
 def main():
+    fg_launcher.launch()
     ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
