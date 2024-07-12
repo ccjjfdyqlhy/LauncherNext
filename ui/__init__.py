@@ -212,7 +212,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             with ui.row():
                 lb = ui.label("安装Java")
                 lb.style('font-size:150%; margin-top:13px;')
-                javaverin=ui.select(["17", "8"], value="17")
+                javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17")
                 javaverin.style("margin-bottom: 15px;padding-right: 10px")
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
 
