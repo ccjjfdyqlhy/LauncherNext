@@ -1,5 +1,6 @@
 import os
 import os.path
+import logging
 import configparser
 import copy
 from .installers import *
@@ -18,6 +19,20 @@ app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
 app.add_static_files('/static',os.path.join(cwd, "static"))  # Use os.path.join instead of "+"
 config = configparser.ConfigParser()
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+class LogElementHandler(logging.Handler):
+    def __init__(self, element: ui.log, level: int = logging.NOTSET) -> None:
+        self.element = element
+        super().__init__(level)
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            msg = self.format(record)
+            self.element.push(msg)
+        except Exception:
+            self.handleError(record)
 
 class GameCard(ui.card):
     def set_game_name(self, game):
@@ -66,7 +81,7 @@ def set_bgc(event: ValueChangeEventArguments):
         with open('lnxt.ini', 'w') as configfile:config.write(configfile)
 
 def select_game(game):
-    print('[INFO] Game selected: '+game)
+    logger.info('Game selected: '+game)
     game_selected=game
     config.set('games', 'game_selected', game)
     with open('lnxt.ini', 'w') as configfile:config.write(configfile)
@@ -98,7 +113,7 @@ if os.path.exists('lnxt.ini'):
     game_list= config.get('games', 'game_list').split(',')
     game_local= config.get('games', 'game_local').split(',')
     game_selected=config.get('games', 'game_selected')
-    print('[CONF] Configuration loaded.')
+    logger.info('Configuration file loaded.')
 else:
     open('lnxt.ini', 'w').close()
     config['general'] = {
@@ -115,7 +130,7 @@ else:
     }
     with open('lnxt.ini', 'w') as configfile:
         config.write(configfile)
-    print('[CONF] New configuration file created.')
+    logger.info('New configuration file created.')
     fgc_name='Defalt'
     bgc_name='Defalt'
     game_list='MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
@@ -126,8 +141,8 @@ else:
 if game_selected == 'None':
     game_selected = '未指定'
 
-if launchtime < 2:
-    print('[INFO] First launch detected.')
+if launchtime <= 2:
+    logger.info('First launch detected.')
     with ui.dialog() as dialog, ui.card():
         ui.label('欢迎!').style('color: #6E93D6; font-size: 200%; font-weight: 300')
         ui.label('LauncherNext 是一个基于 webUI 设计的轻量级应用启动器。')
@@ -137,13 +152,22 @@ if launchtime < 2:
             ui.button('下一步')
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
-    fg_launcher.install()
+    if launchtime == 2:
+        try:
+            launchers.mc_java.MCLauncher.install_cmcl()
+        except KeyboardInterrupt:
+            logger.warn('User aborted.')
+            quit()
+if launchtime % 2 == 0:
+    fg_launcher.launch()
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
     }
 with open('lnxt.ini', 'w') as configfile:
     config.write(configfile)
+
+logger.info('Initalization Complete.')
 
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():
@@ -158,6 +182,9 @@ with ui.header().classes(replace='row items-center') as header:
 with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     ui.label('活跃线程').style('color: #3288AE; font-size: 150%; font-weight: 500')
     ui.label('没有正在进行的任务。').style('color: #3288AE;')
+    log = ui.log(max_lines=10).classes('w-full')
+    handler = LogElementHandler(log)
+    logger.addHandler(handler)
 
 with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     if game_selected == '未指定':
@@ -213,7 +240,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
 
 app.on_disconnect(app.shutdown)
+ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 
 def main():
-    fg_launcher.launch()
     ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
