@@ -237,10 +237,11 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17").style("margin-bottom: 15px;padding-right: 10px")
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
                 ui.label("Java策略: ").style('margin-top:13px;')
-                javarole=ui.select(['自动根据Minecraft版本选择Java','17','11','8'], value="自动根据Minecraft版本选择Java").style("margin-bottom: 15px;padding-right: 10px")
+                javarole=ui.select(['自动根据Minecraft版本选择Java'] + list(JavaManager.versions.keys()), value="自动根据Minecraft版本选择Java").style("margin-bottom: 15px;padding-right: 10px")
             with ui.row():
-                ui.label("JVM内存分配: "+'总内存 '+str(mtotal)+' GB, 当前使用 '+str(mused)+' GB, 可用 '+str(mfree)+' GB').style('margin-top:13px;')
-                slider = ui.slider(min=2, max=mtotal, step=0.5, value=6)
+
+                ui.label("JVM内存分配: "+'总内存 '+str(mtotal)+' GB').style('margin-top:13px;')
+                slider = ui.slider(min=1, max=mtotal, step=0.5, value=8)
                 ui.number().bind_value(slider)
                 ui.label('GB')
 
