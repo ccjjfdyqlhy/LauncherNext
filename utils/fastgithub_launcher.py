@@ -56,14 +56,14 @@ def install():
         return # no need for chmod
     elif platform.system()=="Darwin":
         if platform.machine()=="arm64":
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-arm64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-arm64", "fastgithub"), 0o777)
         else:
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-x64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-x64", "fastgithub"), 0o777)
     elif platform.system()=="Linux":
         if platform.machine()=="arm64":
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-arm64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-arm64", "fastgithub"), 0o777)
         else:
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-x64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-x64", "fastgithub"), 0o777)
 
 def launch():
     if platform.system()=="Windows":
