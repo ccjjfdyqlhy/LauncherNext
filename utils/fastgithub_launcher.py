@@ -56,25 +56,25 @@ def install():
         return # no need for chmod
     elif platform.system()=="Darwin":
         if platform.machine()=="arm64":
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub_osx-arm64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-arm64", "fastgithub"), stat.S_IXGRP)
         else:
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub_osx-x64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-x64", "fastgithub"), stat.S_IXGRP)
     elif platform.system()=="Linux":
         if platform.machine()=="arm64":
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub_linux-arm64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-arm64", "fastgithub"), stat.S_IXGRP)
         else:
-            os.chmod(os.path.join(cwd, "downloads", "fastgithub_linux-x64", "fastgithub"), stat.S_IXGRP)
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-x64", "fastgithub"), stat.S_IXGRP)
 
 def launch():
     if platform.system()=="Windows":
         subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_win-x64", "fastgithub.exe"), shell=True)
     elif platform.system()=="Darwin":
         if platform.machine()=="arm64":
-            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_osx-arm64", "fastgithub"), shell=True)
+            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-arm64", "fastgithub"), shell=True)
         else:
-            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_osx-x64", "fastgithub"), shell=True)
+            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-x64", "fastgithub"), shell=True)
     elif platform.system()=="Linux":
         if platform.machine()=="arm64":
-            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_linux-arm64", "fastgithub"), shell=True)
+            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-arm64", "fastgithub"), shell=True)
         else:
-            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_linux-x64", "fastgithub"), shell=True)
+            subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-x64", "fastgithub"), shell=True)
