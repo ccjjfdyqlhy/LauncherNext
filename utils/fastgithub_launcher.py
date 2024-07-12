@@ -21,7 +21,7 @@ LINUX_X64_LINK2="https://mirror.ghproxy.com/https://raw.githubusercontent.com/22
 LINUX_ARM_LINK1="https://raw.githubusercontent.com/2289182718/FastGithub/main/FastGithub-2.1.4/fastgithub_win-arm64.zip"
 LINUX_ARM_LINK2="https://mirror.ghproxy.com/https://raw.githubusercontent.com/2289182718/FastGithub/main/FastGithub-2.1.4/fastgithub_win-arm64.zip"
 
-logger.info("[FGDL] Running On "+platform.system(),platform.machine())
+logger.info("Running On "+platform.system()+platform.machine())
 
 def install():
     if platform.system()=="Windows":
