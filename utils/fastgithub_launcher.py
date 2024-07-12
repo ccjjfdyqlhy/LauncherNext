@@ -72,7 +72,7 @@ def launch():
     if not os.path.exists(os.path.join(cwd, "downloads", "fastgithub")):
         install()
     if platform.system()=="Windows":
-        subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_win-x64", "fastgithub.exe"), shell=True)
+        subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_win-x64", "fastgithub.exe"), shell=True)
     elif platform.system()=="Darwin":
         if platform.machine()=="arm64":
             subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_osx-arm64", "fastgithub"), shell=True)
