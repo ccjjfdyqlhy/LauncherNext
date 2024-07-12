@@ -6,6 +6,7 @@ import copy
 from .installers import *
 import webbrowser
 import launchers.mc_java
+import utils.fastgithub_launcher as fg_launcher
 from nicegui import ui,app
 from nicegui.events import ValueChangeEventArguments
 
@@ -224,4 +225,5 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
 app.on_disconnect(app.shutdown)
 
 def main():
+    fg_launcher.launch()
     ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
