@@ -96,7 +96,7 @@ def select_game(game):
 memory = psutil.virtual_memory()
 mtotal=int((memory.total / 1024 ** 2)//1024)
 mused=int((memory.used / 1024 ** 2)//1024)
-mfree=int((memory.free / 1024 ** 2)//1024)
+mfree=mtotal-mused
 
 if os.path.exists('lnxt.ini'):
     config.read('lnxt.ini')
