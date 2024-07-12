@@ -1,5 +1,6 @@
 import os
 import os.path
+import logging
 import configparser
 import copy
 from .installers import *
@@ -17,6 +18,8 @@ app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
 app.add_static_files('/static',os.path.join(cwd, "static"))  # Use os.path.join instead of "+"
 config = configparser.ConfigParser()
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class GameCard(ui.card):
     def set_game_name(self, game):
@@ -65,7 +68,7 @@ def set_bgc(event: ValueChangeEventArguments):
         with open('lnxt.ini', 'w') as configfile:config.write(configfile)
 
 def select_game(game):
-    print('[INFO] Game selected: '+game)
+    logger.info('Game selected: '+game)
     game_selected=game
     config.set('games', 'game_selected', game)
     with open('lnxt.ini', 'w') as configfile:config.write(configfile)
@@ -97,7 +100,7 @@ if os.path.exists('lnxt.ini'):
     game_list= config.get('games', 'game_list').split(',')
     game_local= config.get('games', 'game_local').split(',')
     game_selected=config.get('games', 'game_selected')
-    print('[CONF] Configuration loaded.')
+    logger.info('Configuration file loaded.')
 else:
     open('lnxt.ini', 'w').close()
     config['general'] = {
@@ -114,7 +117,7 @@ else:
     }
     with open('lnxt.ini', 'w') as configfile:
         config.write(configfile)
-    print('[CONF] New configuration file created.')
+    logger.info('New configuration file created.')
     fgc_name='Defalt'
     bgc_name='Defalt'
     game_list='MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
@@ -126,7 +129,7 @@ if game_selected == 'None':
     game_selected = '未指定'
 
 if launchtime <= 2:
-    print('[INFO] First launch detected.')
+    logger.info('First launch detected.')
     with ui.dialog() as dialog, ui.card():
         ui.label('欢迎!').style('color: #6E93D6; font-size: 200%; font-weight: 300')
         ui.label('LauncherNext 是一个基于 webUI 设计的轻量级应用启动器。')
@@ -140,7 +143,7 @@ if launchtime <= 2:
         try:
             launchers.mc_java.MCLauncher.install_cmcl()
         except KeyboardInterrupt:
-            print('[DWNL] 必要的下载被取消。')
+            logger.warn('User aborted.')
             quit()
 launchtime = launchtime + 1
 config['general'] = {
@@ -148,6 +151,8 @@ config['general'] = {
     }
 with open('lnxt.ini', 'w') as configfile:
     config.write(configfile)
+
+logger.info('Initalization Complete.')
 
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():

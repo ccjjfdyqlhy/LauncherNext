@@ -177,7 +177,7 @@ class JavaManager():
             print("[DWNL] 取消安装Java")
 
 
-        
+
         #unfinished
 
 

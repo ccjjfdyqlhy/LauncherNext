@@ -2,7 +2,10 @@ from internetDriver import *
 import os
 import platform
 import subprocess
+import logging
 
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 proxy=True
 cwd=os.getcwd()
 WIN_LINK1="https://raw.githubusercontent.com/2289182718/FastGithub/main/FastGithub-2.1.4/fastgithub_win-x64.zip"
@@ -16,12 +19,12 @@ LINUX_X64_LINK2="https://mirror.ghproxy.com/https://raw.githubusercontent.com/22
 LINUX_ARM_LINK1="https://raw.githubusercontent.com/2289182718/FastGithub/main/FastGithub-2.1.4/fastgithub_win-arm64.zip"
 LINUX_ARM_LINK2="https://mirror.ghproxy.com/https://raw.githubusercontent.com/2289182718/FastGithub/main/FastGithub-2.1.4/fastgithub_win-arm64.zip"
 
-print("[FGDL] Running On "+platform.system(),platform.machine())
+logger.info("[FGDL] Running On "+platform.system(),platform.machine())
 
 def install():
     if platform.system()=="Windows":
         if platform.machine()=="arm64":
-            print("[FGDL] Unsupported Architecture")
+            logger.error("[FGDL] Unsupported Architecture")
         else:
             if proxy:
                 DownloadFile(WIN_LINK2, cwd+"\\downloads\\fastgithub.zip")
