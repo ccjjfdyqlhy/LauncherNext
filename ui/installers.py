@@ -1,4 +1,3 @@
-from launchers import *
 import threading
 from launchers.mc_java import *
 

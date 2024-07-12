@@ -1,10 +1,11 @@
-from . import Launcher
-import subprocess
-import tempfile
 import os
 import os.path
 import platform
+import subprocess
+
 from internetDriver import *
+
+from . import Launcher
 
 proxy=False
 

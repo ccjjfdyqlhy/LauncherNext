@@ -1,6 +1,7 @@
-from ui import main
-import utils.fastgithub_launcher as fglauncher
 import logging
+
+import utils.fastgithub_launcher as fglauncher
+from ui import main
 
 test=0
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')

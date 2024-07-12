@@ -1,15 +1,18 @@
-import os
-import os.path
-import logging
 import configparser
 import copy
 import psutil
-from .installers import *
+import logging
+import os
+import os.path
 import webbrowser
+
+from nicegui import app, ui
+from nicegui.events import ValueChangeEventArguments
+
 import launchers.mc_java
 import utils.fastgithub_launcher as fg_launcher
-from nicegui import ui,app
-from nicegui.events import ValueChangeEventArguments
+
+from .installers import *
 
 __version__='0.0.3'
 forecolor='#FFFFFF'
@@ -147,7 +150,7 @@ else:
 if game_selected == 'None':
     game_selected = '未指定'
 
-if launchtime <= 2:
+if launchtime < 2:
     logger.info('First launch detected.')
     with ui.dialog() as dialog, ui.card():
         ui.label('欢迎!').style('color: #6E93D6; font-size: 200%; font-weight: 300')
@@ -158,12 +161,6 @@ if launchtime <= 2:
             ui.button('下一步')
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
-    if launchtime == 2:
-        try:
-            launchers.mc_java.MCLauncher.install_cmcl()
-        except KeyboardInterrupt:
-            logger.warn('User aborted.')
-            quit()
 if launchtime % 2 == 0:
     fg_launcher.launch()
 launchtime = launchtime + 1

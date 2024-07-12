@@ -1,10 +1,10 @@
-from internetDriver import *
+import logging
 import os
 import os.path
-import stat
 import platform
 import subprocess
-import logging
+
+from internetDriver import *
 
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -69,6 +69,8 @@ def install():
             os.chmod(os.path.join(cwd, "downloads", "fastgithub", "fastgithub_linux-x64", "fastgithub"), 0o777)
 
 def launch():
+    if not os.path.exists(os.path.join(cwd, "downloads", "fastgithub")):
+        install()
     if platform.system()=="Windows":
         subprocess.Popen(os.path.join(cwd, "downloads", "fastgithub_win-x64", "fastgithub.exe"), shell=True)
     elif platform.system()=="Darwin":
