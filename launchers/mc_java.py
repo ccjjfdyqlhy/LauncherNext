@@ -149,7 +149,7 @@ class JavaManager():
     def install_java_macos(cls, version):
         if platform.machine() == "arm64":
             if version == "8":
-                raise NotImplementedError("Doesn't support Java 8 on Apple M-seriess")
+                raise NotImplementedError("Doesn't support Java 8 on Apple M-series")
             # runnning on arm64
             url = cls.versions[version]+"macos-aarch64_bin.dmg"
         else:
