@@ -1,6 +1,7 @@
 from internetDriver import *
 import os
 import os.path
+import stat
 import platform
 import subprocess
 
@@ -51,6 +52,18 @@ def install():
             else:
                 DownloadFile(LINUX_ARM_LINK1, os.path.join(cwd, "downloads", "fastgithub.zip"))
     UnzipToLocation(os.path.join(cwd, "downloads", "fastgithub.zip"), os.path.join(cwd, "downloads", "fastgithub"))
+    if platform.system()=="Windows":
+        return # no need for chmod
+    elif platform.system()=="Darwin":
+        if platform.machine()=="arm64":
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub_osx-arm64", "fastgithub"), stat.S_IXGRP)
+        else:
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub_osx-x64", "fastgithub"), stat.S_IXGRP)
+    elif platform.system()=="Linux":
+        if platform.machine()=="arm64":
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub_linux-arm64", "fastgithub"), stat.S_IXGRP)
+        else:
+            os.chmod(os.path.join(cwd, "downloads", "fastgithub_linux-x64", "fastgithub"), stat.S_IXGRP)
 
 def launch():
     if platform.system()=="Windows":
