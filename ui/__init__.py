@@ -22,6 +22,18 @@ config = configparser.ConfigParser()
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+class LogElementHandler(logging.Handler):
+    def __init__(self, element: ui.log, level: int = logging.NOTSET) -> None:
+        self.element = element
+        super().__init__(level)
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            msg = self.format(record)
+            self.element.push(msg)
+        except Exception:
+            self.handleError(record)
+
 class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
@@ -170,6 +182,9 @@ with ui.header().classes(replace='row items-center') as header:
 with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     ui.label('活跃线程').style('color: #3288AE; font-size: 150%; font-weight: 500')
     ui.label('没有正在进行的任务。').style('color: #3288AE;')
+    log = ui.log(max_lines=10).classes('w-full')
+    handler = LogElementHandler(log)
+    logger.addHandler(handler)
 
 with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     if game_selected == '未指定':
@@ -225,6 +240,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
 
 app.on_disconnect(app.shutdown)
+ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 
 def main():
     ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
