@@ -3,6 +3,8 @@
 /downloads/*
 /tests/*
 /.nicegui/*
+/build/*
+/dist/*
 lnxt.ini
 DSproduct.cfg
 .venv/*
