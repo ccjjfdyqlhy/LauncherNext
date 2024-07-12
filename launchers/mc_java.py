@@ -136,6 +136,7 @@ class MCLauncher(Launcher):
 class JavaManager():
     versions = {
         "17": "https://download.oracle.com/java/17/latest/jdk-17_",
+        "11": "https://files02.tchspt.com/down/jdk-11.0.22_",
         "8": "https://github.com/hmsjy2017/get-jdk/releases/download/v8u231/jdk-8u231-"
     }
     @classmethod
