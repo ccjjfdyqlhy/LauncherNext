@@ -50,7 +50,7 @@ def AbsPathConstructor(fileName, dst):
 
 def DownloadFile(url, fileName):
   try:
-    fileObject = requests.get(url,stream=True)
+    fileObject = requests.get(url,stream=True,verify=False)
     total = int(fileObject.headers.get('content-length', 0))
     with open(fileName, 'wb') as localFile, tqdm(
       desc=fileName,

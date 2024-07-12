@@ -6,6 +6,8 @@ import os.path
 import platform
 from internetDriver import *
 
+proxy=False
+
 class MCLauncher(Launcher):
     JVM_ARGS = {}
 
@@ -78,8 +80,10 @@ class MCLauncher(Launcher):
                 break
         else:
             assert False, "This shouldn't happen: no jar version of cmcl"
-        DownloadFile("https://mirror.ghproxy.com/"+url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
-
+        if proxy == True:
+            DownloadFile("https://mirror.ghproxy.com/"+url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
+        else:
+            DownloadFile(url, os.path.join(os.getcwd(), "downloads", "Minecraft_Java", "cmcl.jar"))
     @classmethod
     def install_minecraft(cls, version):
         cmcl_args = ["install", version]
@@ -161,12 +165,15 @@ class JavaManager():
         subprocess.Popen(["open", path])
     @classmethod
     def install_java(cls, version="17"):
-        if platform.system() == "Darwin": #on MacOS
-            cls.install_java_macos(version)
-        elif platform.system() == "Windows": # on Windows
-            cls.install_java_windows(version)
-        else: #on Linux
-            raise NotImplementedError("Not implemented yet")
+        try:
+            if platform.system() == "Darwin": #on MacOS
+                cls.install_java_macos(version)
+            elif platform.system() == "Windows": # on Windows
+                cls.install_java_windows(version)
+            else: #on Linux
+                raise NotImplementedError("Not implemented yet")
+        except KeyboardInterrupt:
+            print("[DWNL] 取消安装Java")
 
 
         

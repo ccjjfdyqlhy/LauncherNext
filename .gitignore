@@ -1,7 +1,7 @@
 *.pyc
 *.zip
 /downloads/*
-/test/*
+/tests/*
 /.nicegui/*
 lnxt.ini
 DSproduct.cfg
