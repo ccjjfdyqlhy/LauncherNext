@@ -1,5 +1,6 @@
 import configparser
 import copy
+import psutil
 import logging
 import os
 import os.path
@@ -92,6 +93,11 @@ def select_game(game):
     launch_bt.set_text('启动 '+game)
     gamelabel.set_text('选定项目: '+game_selected)
 
+memory = psutil.virtual_memory()
+mtotal=int((memory.total / 1024 ** 2)//1024)
+mused=int((memory.used / 1024 ** 2)//1024)
+mfree=int((memory.free / 1024 ** 2)//1024)
+
 if os.path.exists('lnxt.ini'):
     config.read('lnxt.ini')
     launchtime = int(config.get('general', 'launch'))
@@ -182,6 +188,7 @@ with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     log = ui.log(max_lines=10).classes('w-full')
     handler = LogElementHandler(log)
     logger.addHandler(handler)
+    ui.linear_progress()
 
 with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('启动面板'):
@@ -223,12 +230,18 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             bgcradio=ui.radio(['Defalt','Orange'],value=bgc_name,on_change=set_bgc).props('inline')
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
+            ui.label('Minecraft').style('font-size: 125%')
             with ui.row():
-                lb = ui.label("安装Java")
-                lb.style('font-size:150%; margin-top:13px;')
-                javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17")
-                javaverin.style("margin-bottom: 15px;padding-right: 10px")
+                ui.label("安装Java").style('margin-top:13px;')
+                javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17").style("margin-bottom: 15px;padding-right: 10px")
                 ui.button('下载Java',on_click=get_java_installer_onclick(javaverin)).style("margin-top: 10px;")
+            with ui.row():
+                with ui.column():
+                    ui.label("JVM内存分配").style('margin-top:13px;')
+                    ui.label('总内存 '+str(mtotal)+' GB, 当前使用 '+str(mused)+' GB, 可用 '+str(mfree)+' GB')
+                slider = ui.slider(min=2, max=mtotal, step=0.5, value=6)
+                ui.number().bind_value(slider)
+                ui.label('GB')
 
 with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     if game_selected == '未指定':
