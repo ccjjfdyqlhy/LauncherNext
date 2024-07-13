@@ -10,7 +10,7 @@ from nicegui import app, ui
 from nicegui.events import ValueChangeEventArguments
 
 import launchers.mc_java
-import utils.fastgithub_launcher as fg_launcher
+import utils.fastgithub as fg_launcher
 
 from .installers import *
 
@@ -42,6 +42,10 @@ class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
         self.on("click", lambda: select_game(self._game_name))
+
+def onstop():
+    fg_launcher.kill()
+    app.shutdown()
 
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
@@ -251,7 +255,7 @@ with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     else:
         launch_bt=ui.button(text='启动 '+game_selected)
 
-app.on_disconnect(app.shutdown)
+app.on_disconnect(lambda: onstop())
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 
 def main():

@@ -1,6 +1,6 @@
 import logging
 
-import utils.fastgithub_launcher as fglauncher
+import utils.fastgithub as fglauncher
 from ui import main
 
 test=0

@@ -66,10 +66,11 @@ def DownloadFile(url, fileName):
   except requests.exceptions.ConnectTimeout:
     print('[DWNL] 下载失败，连接超时。')
 
-def UnzipToLocation(src, dst, deleteSrc = False):
+def UnzipToLocation(src, dst, deleteSrc = True):
   with zipfile.ZipFile(src, 'r') as zip_ref:
     zip_ref.extractall(dst)
-  os.remove(src)
+  if deleteSrc:
+    os.remove(src)
 
 def CheckIfZip(fileName):
   return zipfile.is_zipfile(fileName)

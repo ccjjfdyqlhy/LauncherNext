@@ -1,6 +1,7 @@
 *.pyc
 *.zip
 /downloads/*
+/apps/*
 /tests/*
 /.nicegui/*
 /build/*
