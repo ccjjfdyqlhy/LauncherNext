@@ -1,6 +1,7 @@
 ## 🚀 LauncherNext
 
-LauncherNext 是一个基于 WebUI 和 Python 的轻量级应用启动器，旨在提供简洁直观的界面，方便用户管理和启动各种应用程序。
+LauncherNext 是一个基于 WebUI 和 Python 的轻量级应用启动器，旨在提供简洁直观的界面，方便用户管理和启动各种应用程序。  
+新功能预定！**I want you to launch AI frameworks!**
 
 ✨ **主要功能：**
 
