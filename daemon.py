@@ -3,6 +3,7 @@ import time
 import threading
 import logging
 import os
+import re
 import psutil
 import winreg
 
@@ -43,6 +44,53 @@ def is_alive(process_name):
       pass
   return False
 
+def runtime_out(input_string):
+  """
+  剔除字符串中匹配预定义正则表达式模式的项目。
+
+  Args:
+    input_string: 含有待处理项目的逗号分隔字符串。
+
+  Returns:
+    剔除匹配项后，剩余项目组成的逗号分隔字符串。
+  """
+  patterns = [
+    r"^cu.*",
+    r"^nv.*",
+    r"^Nvidia.*",
+    r"^NVIDIA.*",                # 匹配所有以 "NVIDIA" 开头的项目。
+    r"^CUDA.*",                 # 匹配所有以 "CUDA" 开头的项目。
+    r"^CUBLAS.*",               # 匹配所有以 "CUBLAS" 开头的项目。
+    r"^CUFFT.*",                # 匹配所有以 "CUFFT" 开头的项目。
+    r"^CUPTI.*",                # 匹配所有以 "CUPTI" 开头的项目。
+    r"^CURAND.*",               # 匹配所有以 "CURAND" 开头的项目。
+    r"^CUSOLVER.*",              # 匹配所有以 "CUSOLVER" 开头的项目。
+    r"^CUSPARSE.*",              # 匹配所有以 "CUSPARSE" 开头的项目。
+    r"^Microsoft Visual C++.*",     # 匹配所有以 "Microsoft Visual C++" 开头的项目。
+    r"^NVRTC.*",                # 匹配所有以 "NVRTC" 开头的项目。
+    r"^NV.*",                   # 匹配所有以 "NV" 开头的项目（除了已经被以上规则覆盖的项目）。
+    r".*Runtime.*",              # 匹配所有包含 "Runtime" 的项目。
+    r".*Documentation.*",          # 匹配所有包含 "Documentation" 的项目。
+    r".*Profiler.*",             # 匹配所有包含 "Profiler" 的项目。
+    r".*Container.*",            # 匹配所有包含 "Container" 的项目。
+    r".*Suite.*",                # 匹配所有包含 "Suite" 的项目。
+    r".*Driver.*",               # 匹配所有包含 "Driver" 的项目。
+    r".*Installer.*",            # 匹配所有包含 "Installer" 的项目。
+    r"vs_FileTracker_Singleton", # 匹配 "vs_FileTracker_Singleton" 项目。
+    r"\${{arpDisplayName}}"      # 匹配 "${{arpDisplayName}}" 项目。
+  ]
+
+  input_list = [item.strip() for item in input_string.split(',')]
+  filtered_list = input_list.copy()
+
+  for pattern in patterns:
+    filtered_list = [item for item in filtered_list if not re.match(pattern, item)]
+
+  # 去重
+  unique_list = list(set(filtered_list)) 
+
+  return ', '.join(unique_list)
+
 def get_installed_list_win():
     """获取 Windows 系统上安装的软件列表，以逗号分隔的字符串形式返回。"""
 
@@ -72,4 +120,5 @@ def get_installed_list_win():
 
     # 将软件列表转换为逗号分隔的字符串
     software_string = ", ".join(software_list)
+    software_string = runtime_out(software_string)
     return software_string

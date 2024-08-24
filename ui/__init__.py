@@ -41,17 +41,21 @@ class LogElementHandler(logging.Handler):
         except Exception:
             self.handleError(record)
 
+
 class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
         self.on("click", lambda: select_game(self._game_name))
 
+
 def onstop():
     fg_launcher.kill()
     app.shutdown()
 
+
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
+
 
 def set_fgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
@@ -80,6 +84,7 @@ def set_fgc(event: ValueChangeEventArguments):
         config.set('settings', 'forecolor', '#5898D4')
         with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile: config.write(configfile)
 
+
 def set_bgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
     if f'{name}: {event.value}' == 'Radio: Orange':
@@ -90,6 +95,7 @@ def set_bgc(event: ValueChangeEventArguments):
         set_background('#ffffff')
         config.set('settings', 'bgcolor', '#ffffff')
         with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile: config.write(configfile)
+
 
 def set_pyver():
     pyver = pyverin.value()
@@ -119,6 +125,7 @@ def update_launch_button():
         launch_bt.set_text('启动 ' + selected_game)
 
 def xlaunch(instance):
+    if instance == None: logger.error('No instance selected');return
     if not os.path.exists(cwd + '\\apps\\' + instance):
         logger.warning('Instance folder not found, launching from config file')
         isappfolder = False
@@ -200,6 +207,8 @@ if os.path.exists('lnxt.ini'):
     installed_apps = config.get('apps', 'installed').split(',')
     game_list = config.get('apps', 'game_list').split(',')
     game_local = config.get('apps', 'game_local').split(',')
+
+    # 读取上次选定的实例
     game_selected = config.get('apps', 'game_selected')
     logger.info('Configuration file loaded.')
 else:
@@ -230,8 +239,11 @@ else:
     game_selected = 'None'
     launchtime = 1
 
-if game_selected == 'None':
-    game_selected = '未指定'
+# --- 初始化选定项 ---
+if game_selected != 'None' and game_selected in game_list:
+    selected_game = game_selected  # 使用配置中读取的值
+else:
+    selected_game = None  # 或设置为 None 表示未选定
 
 if launchtime < 2:
     logger.info('First launch detected.')
@@ -276,7 +288,7 @@ with ui.left_drawer().classes('bg-blue-200') as left_drawer:
 with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('启动面板'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
-        gamelabel = ui.label('选定项目: ' + game_selected)
+        gamelabel = ui.label('选定项目: ' + str(selected_game or '未指定')) # 初始化标签文本
     with ui.tab_panel('产品库'):
         with ui.column():
             with ui.card():
@@ -292,6 +304,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             with ui.card():
                 ui.label('系统应用').style('font-size: 150%; font-weight: 300')
                 ui.label('LauncherNext同时还扫描了你电脑上已经安装的应用程序。不过由于其数量较多，我们不建议通过该列表启动这些程序。')
+                ui.label('系统运行时与驱动已剔除。')
                 systemappschk = ui.checkbox('查看系统应用', value=False)
                 for oapp in installed_apps:
                     with ui.card().bind_visibility_from(systemappschk, 'value'):
@@ -323,7 +336,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             ui.label('前景色设置')
             fgcradio = ui.radio(['Defalt', 'Atlantic', 'Forest', 'Deep Ocean', 'Grey'], value=fgc_name,
                                 on_change=set_fgc).props('inline')
-            ui.label('边框颜色设置')
+            ui.label('背景色设置(Beta)')
             bgcradio = ui.radio(['Defalt', 'Orange'], value=bgc_name, on_change=set_bgc).props('inline')
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
