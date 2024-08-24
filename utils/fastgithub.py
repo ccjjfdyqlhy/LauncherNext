@@ -3,6 +3,7 @@ import os
 import os.path
 import platform
 import subprocess
+import daemon
 
 from internetDriver import *
 
@@ -47,25 +48,25 @@ def launch():
     if not os.path.exists(os.path.join(cwd, "apps", "fastgithub_win-x64" or "fastgithub_osx-x64" or "fastgithub_osx-arm64" or "fastgithub_linux-x64" or "fastgithub_linux-arm64")):
         install()
     if platform.system()=="Windows":
-        subprocess.Popen(os.path.join(cwd, "apps", "fastgithub_win-x64", "fastgithub.exe"), shell=True)
+        daemon.exec(os.path.join(cwd, "apps", "fastgithub_win-x64", "fastgithub.exe"), shell=True)
     elif platform.system()=="Darwin":
         if platform.machine()=="arm64":
-            subprocess.Popen(os.path.join(cwd, "apps", "fastgithub_osx-arm64", "fastgithub"), shell=True)
+            daemon.exec(os.path.join(cwd, "apps", "fastgithub_osx-arm64", "fastgithub"), shell=True)
         else:
-            subprocess.Popen(os.path.join(cwd, "apps", "fastgithub_osx-x64", "fastgithub"), shell=True)
+            daemon.exec(os.path.join(cwd, "apps", "fastgithub_osx-x64", "fastgithub"), shell=True)
     elif platform.system()=="Linux":
         if platform.machine()=="arm64":
-            subprocess.Popen(os.path.join(cwd, "apps", "fastgithub_linux-arm64", "fastgithub"), shell=True)
+            daemon.exec(os.path.join(cwd, "apps", "fastgithub_linux-arm64", "fastgithub"), shell=True)
         else:
-            subprocess.Popen(os.path.join(cwd, "apps", "fastgithub_linux-x64", "fastgithub"), shell=True)
+            daemon.exec(os.path.join(cwd, "apps", "fastgithub_linux-x64", "fastgithub"), shell=True)
 
 def kill(): #Does not work yet
     if platform.system()=="Windows":
-        subprocess.Popen("taskkill /f /im fastgithub.exe", shell=True)
-        subprocess.Popen("taskkill /f /im dnscrypt-proxy.exe", shell=True)
+        daemon.exec("taskkill /f /im fastgithub.exe", shell=True)
+        daemon.exec("taskkill /f /im dnscrypt-proxy.exe", shell=True)
     elif platform.system()=="Linux":
-        subprocess.Popen("pkill fastgithub", shell=True)
-        subprocess.Popen("pkill dnscrypt-proxy", shell=True)
+        daemon.exec("pkill fastgithub", shell=True)
+        daemon.exec("pkill dnscrypt-proxy", shell=True)
     elif platform.system()=="Darwin":
-        subprocess.Popen("pkill fastgithub", shell=True)
-        subprocess.Popen("pkill dnscrypt-proxy", shell=True)
+        daemon.exec("pkill fastgithub", shell=True)
+        daemon.exec("pkill dnscrypt-proxy", shell=True)

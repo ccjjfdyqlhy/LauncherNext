@@ -31,10 +31,6 @@ psutil==6.0.0
 pydantic==2.8.2
 pydantic_core==2.20.1
 Pygments==2.18.0
-pyobjc-core==10.3.1
-pyobjc-framework-Cocoa==10.3.1
-pyobjc-framework-Security==10.3.1
-pyobjc-framework-WebKit==10.3.1
 python-dotenv==1.0.1
 python-engineio==4.9.1
 python-multipart==0.0.9
@@ -49,7 +45,6 @@ tqdm==4.66.4
 typing_extensions==4.12.2
 urllib3==2.2.2
 uvicorn==0.30.1
-uvloop==0.19.0
 vbuild==0.8.2
 watchfiles==0.22.0
 websockets==12.0
