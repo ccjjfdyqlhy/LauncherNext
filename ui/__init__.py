@@ -15,7 +15,7 @@ import utils.fastgithub as fg_launcher
 
 from .installers import *
 
-__version__='0.0.3'
+__version__='0.0.4'
 forecolor='#FFFFFF'
 bgcolor='#ffffff'
 firstlaunch=False
@@ -89,6 +89,9 @@ def set_bgc(event: ValueChangeEventArguments):
         config.set('settings', 'bgcolor', '#ffffff')
         with open('lnxt.ini', 'w') as configfile:config.write(configfile)
 
+def set_pyver():
+    pyver = pyverin.value()
+
 def select_game(game):
     logger.info('Instance selected: '+game)
     game_selected=game
@@ -145,6 +148,7 @@ def xlaunch(instance):
         daemon.exec(appexec,vcwd)
     else:
         daemon.exec(appexec)
+    logger.info('Launch complete.')
 
 memory = psutil.virtual_memory()
 mtotal=int((memory.total / 1024 ** 2)//1024)
@@ -215,6 +219,7 @@ if launchtime < 2:
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
 if launchtime % 2 == 0:
+    print('\nLauncherNext Interface '+__version__+'\n')
     if not daemon.is_alive('fastgithub.exe'):
         fg_launcher.launch()
     else:
@@ -251,7 +256,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
         gamelabel=ui.label('选定项目: '+game_selected)
     with ui.tab_panel('产品库'):
-        with ui.column():
+            ui.label('单击你要使用的项目，然后转到 [启动面板] 。')
             for game in game_list:
                 with GameCard() as card:
                     card.set_game_name(game)
@@ -287,7 +292,13 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             bgcradio=ui.radio(['Defalt','Orange'],value=bgc_name,on_change=set_bgc).props('inline')
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
-            ui.label('Minecraft').style('font-size: 125%')
+            ui.label('Python类').style('font-size: 125%')
+            #TODO
+            with ui.column():
+                with ui.row():
+                    pyverin=ui.input("默认Python运行时:")
+                    ui.button('应用')
+            ui.label('Minecraft类').style('font-size: 125%')
             with ui.row():
                 ui.label("安装Java: ").style('margin-top:13px;')
                 javaverin=ui.select(list(launchers.mc_java.JavaManager.versions.keys()), value="17").style("margin-bottom: 15px;padding-right: 10px")
@@ -295,7 +306,6 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 ui.label("Java策略: ").style('margin-top:13px;')
                 javarole=ui.select(['自动根据Minecraft版本选择Java'] + list(JavaManager.versions.keys()), value="自动根据Minecraft版本选择Java").style("margin-bottom: 15px;padding-right: 10px")
             with ui.row():
-
                 ui.label("JVM内存分配: "+'总内存 '+str(mtotal)+' GB').style('margin-top:13px;')
                 slider = ui.slider(min=1, max=mtotal, step=0.5, value=8)
                 ui.number().bind_value(slider)
@@ -312,4 +322,4 @@ app.on_disconnect(lambda: onstop())
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 
 def main():
-    ui.run(native=True, window_size=(1280,720), title='LauncherNext 启动器', reload=False)
+    ui.run(native=True, window_size=(1280,720), title='LauncherNext Interface', reload=False)
