@@ -4,6 +4,7 @@ import threading
 import logging
 import os
 import psutil
+import winreg
 
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -41,3 +42,34 @@ def is_alive(process_name):
     except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
       pass
   return False
+
+def get_installed_list_win():
+    """获取 Windows 系统上安装的软件列表，以逗号分隔的字符串形式返回。"""
+
+    software_list = []
+
+    for i in range(2):  # 检查 32 位和 64 位注册表项
+        if i == 0:
+            reg_path = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall'
+        else:
+            reg_path = r'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+
+        try:
+            with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, reg_path) as key:
+                num_subkeys = winreg.QueryInfoKey(key)[0]
+
+                for j in range(num_subkeys):
+                    try:
+                        subkey_name = winreg.EnumKey(key, j)
+                        with winreg.OpenKey(key, subkey_name) as subkey:
+                            display_name, _ = winreg.QueryValueEx(subkey, 'DisplayName')
+                            if display_name:
+                                software_list.append(display_name)
+                    except WindowsError:
+                        pass
+        except WindowsError:
+            pass
+
+    # 将软件列表转换为逗号分隔的字符串
+    software_string = ", ".join(software_list)
+    return software_string

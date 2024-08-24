@@ -6,6 +6,7 @@ import os
 import os.path
 import webbrowser
 import daemon
+import sys
 
 from nicegui import app, ui
 from nicegui.events import ValueChangeEventArguments
@@ -57,37 +58,37 @@ def set_fgc(event: ValueChangeEventArguments):
         ui.colors(primary='#555')
         forecolor='#555'
         config.set('settings', 'forecolor', '#555')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Atlantic':
         ui.colors(primary='#3288AE')
         forecolor='#3288AE'
         config.set('settings', 'forecolor', '#3288AE')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Forest':
         ui.colors(primary='#346C48')
         forecolor='#346C48'
         config.set('settings', 'forecolor', '#346C48')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
     elif f'{name}: {event.value}' == 'Radio: Deep Ocean':
         ui.colors(primary='#072A69')
         forecolor='#072A69'
         config.set('settings', 'forecolor', '#072A69')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
     else:
         ui.colors()
         config.set('settings', 'forecolor', '#5898D4')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
 
 def set_bgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
     if f'{name}: {event.value}' == 'Radio: Orange':
         set_background('#ffeedd')
         config.set('settings', 'bgcolor', '#ffeedd')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
     else:
         set_background('#ffffff')
         config.set('settings', 'bgcolor', '#ffffff')
-        with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+        with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
 
 def set_pyver():
     pyver = pyverin.value()
@@ -96,7 +97,7 @@ def select_game(game):
     logger.info('Instance selected: '+game)
     game_selected=game
     config.set('apps', 'game_selected', game)
-    with open('lnxt.ini', 'w') as configfile:config.write(configfile)
+    with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:config.write(configfile)
     launch_bt.props(remove='disabled')
     launch_bt.set_text('启动 '+game)
     launch_bt.on('click', lambda:xlaunch(game))
@@ -156,7 +157,12 @@ mused=int((memory.used / 1024 ** 2)//1024)
 mfree=mtotal-mused
 
 if os.path.exists('lnxt.ini'):
-    config.read('lnxt.ini')
+    if sys.platform == 'win32':
+        installed_apps = daemon.get_installed_list_win()
+    config.set('apps', 'install', installed_apps)
+    with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:
+        config.write(configfile)
+    config.read('lnxt.ini',encoding='utf-8-sig')
     launchtime = int(config.get('general', 'launch'))
     forecolor = config.get('settings', 'forecolor')
     bgcolor = config.get('settings', 'bgcolor')
@@ -181,7 +187,9 @@ if os.path.exists('lnxt.ini'):
     game_selected=config.get('apps', 'game_selected')
     logger.info('Configuration file loaded.')
 else:
-    open('lnxt.ini', 'w').close()
+    if sys.platform == 'win32':
+        installed_apps = daemon.get_installed_list_win()
+    open('lnxt.ini', 'w',encoding='utf-8-sig').close()
     config['general'] = {
     "launch": '1'
     }
@@ -190,11 +198,12 @@ else:
     "bgcolor": "#ffffff"
     }
     config['apps'] = {
+    "installed": installed_apps,
     "game_list": 'MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact',
     "game_local": 'None',
     "game_selected": 'None'
     }
-    with open('lnxt.ini', 'w') as configfile:
+    with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
         config.write(configfile)
     logger.info('New configuration file created.')
     fgc_name='Defalt'
@@ -228,7 +237,7 @@ launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
     }
-with open('lnxt.ini', 'w') as configfile:
+with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
     config.write(configfile)
 
 logger.info('Initalization Complete.')
