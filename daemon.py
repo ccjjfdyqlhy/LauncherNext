@@ -27,6 +27,7 @@ def exec(path,cwd=os.getcwd(),shell=False):
         monitor_thread.start()
     except FileNotFoundError:
         logger.error(f"'{path}' does not exist.")
+        raise FileNotFoundError(f"'{path}' does not exist.")
 
 def is_alive(process_name):
   """检查给定名称的进程是否正在运行。
