@@ -159,7 +159,8 @@ mfree=mtotal-mused
 if os.path.exists('lnxt.ini'):
     if sys.platform == 'win32':
         installed_apps = daemon.get_installed_list_win()
-    config.set('apps', 'install', installed_apps)
+    config.read('lnxt.ini',encoding='utf-8-sig')
+    config.set('apps', 'installed', installed_apps)
     with open('lnxt.ini', 'w',encoding='utf-8-sig') as configfile:
         config.write(configfile)
     config.read('lnxt.ini',encoding='utf-8-sig')
@@ -182,6 +183,7 @@ if os.path.exists('lnxt.ini'):
         bgc_name='Defalt'
     ui.colors(primary=forecolor)
     set_background(bgcolor)
+    installed_apps= config.get('apps', 'installed').split(',')
     game_list= config.get('apps', 'game_list').split(',')
     game_local= config.get('apps', 'game_local').split(',')
     game_selected=config.get('apps', 'game_selected')
@@ -208,6 +210,7 @@ else:
     logger.info('New configuration file created.')
     fgc_name='Defalt'
     bgc_name='Defalt'
+    installed_apps=installed_apps.split(',')
     game_list='MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
     game_local='None'
     game_selected='None'
@@ -265,13 +268,24 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
         gamelabel=ui.label('选定项目: '+game_selected)
     with ui.tab_panel('产品库'):
-            ui.label('单击你要使用的项目，然后转到 [启动面板] 。')
-            for game in game_list:
-                with GameCard() as card:
-                    card.set_game_name(game)
-                    with ui.row():
-                        onclick = lambda: gamelabel.set_text('选定项目: '+game)
-                        l = ui.label(game)
+        with ui.column():
+            with ui.card():
+                ui.label('可用实例').style('font-size: 150%; font-weight: 300')
+                ui.label('下面列出了已经适配于LauncherNext的全部程序实例。')
+                ui.label('单击你要使用的项目，然后转到 [启动面板] 。')
+                for game in game_list:
+                    with GameCard() as card:
+                        card.set_game_name(game)
+                        with ui.row():
+                            onclick = lambda: gamelabel.set_text('选定项目: '+game)
+                            ui.label(game)
+            with ui.card():
+                ui.label('系统应用').style('font-size: 150%; font-weight: 300')
+                ui.label('LauncherNext同时还扫描了你电脑上已经安装的应用程序。不过由于其数量较多，我们不建议通过该列表启动这些程序。')
+                systemappschk = ui.checkbox('查看系统应用', value=False)
+                for oapp in installed_apps:
+                    with ui.card().bind_visibility_from(systemappschk, 'value'):
+                        ui.label(oapp)
 
     with ui.tab_panel('启动器设置'):
         ui.label('这里的设置会自动保存。')
