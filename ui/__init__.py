@@ -1,3 +1,6 @@
+import subprocess
+import time
+import threading
 import configparser
 import copy
 import psutil
@@ -20,6 +23,7 @@ __version__ = '0.0.4'
 forecolor = '#FFFFFF'
 bgcolor = '#ffffff'
 firstlaunch = False
+selected_game = None
 cwd = os.getcwd()
 app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
@@ -46,11 +50,6 @@ class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
         self.on("click", lambda: select_game(self._game_name))
-
-
-def onstop():
-    fg_launcher.kill()
-    app.shutdown()
 
 
 def set_background(color: str) -> None:
@@ -100,8 +99,6 @@ def set_bgc(event: ValueChangeEventArguments):
 def set_pyver():
     pyver = pyverin.value()
 
-# --- 全局变量存储选定项 ---
-selected_game = None
 
 def select_game(game):
     global selected_game  # 使用全局变量
@@ -114,7 +111,7 @@ def select_game(game):
     update_launch_button()
     gamelabel.set_text('选定项目: ' + selected_game)
 
-# --- 更新启动按钮的函数 ---
+
 def update_launch_button():
     global selected_game # 使用全局变量
     if selected_game is None:
@@ -123,6 +120,7 @@ def update_launch_button():
     else:
         launch_bt.props(remove='disabled')
         launch_bt.set_text('启动 ' + selected_game)
+
 
 def xlaunch(instance):
     if instance == None: logger.error('No instance selected');return
@@ -172,16 +170,19 @@ def xlaunch(instance):
         daemon.exec(appexec)
     logger.info('Launch complete.')
 
+
 memory = psutil.virtual_memory()
 mtotal = int((memory.total / 1024 ** 2) // 1024)
 mused = int((memory.used / 1024 ** 2) // 1024)
 mfree = mtotal - mused
 
 if os.path.exists('lnxt.ini'):
+    game_local,invalid_instances = daemon.scan_instances()
     if sys.platform == 'win32':
         installed_apps = daemon.get_installed_list_win()
     config.read('lnxt.ini', encoding='utf-8-sig')
     config.set('apps', 'installed', installed_apps)
+    config.set('apps', 'game_local', game_local)
     with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
         config.write(configfile)
     config.read('lnxt.ini', encoding='utf-8-sig')
@@ -214,6 +215,7 @@ if os.path.exists('lnxt.ini'):
 else:
     if sys.platform == 'win32':
         installed_apps = daemon.get_installed_list_win()
+    game_local, invalid_instances = daemon.get_game_local()
     open('lnxt.ini', 'w', encoding='utf-8-sig').close()
     config['general'] = {
         "launch": '1'
@@ -225,7 +227,7 @@ else:
     config['apps'] = {
         "installed": installed_apps,
         "game_list": 'MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact',
-        "game_local": 'None',
+        "game_local": game_local,
         "game_selected": 'None'
     }
     with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
@@ -235,7 +237,7 @@ else:
     bgc_name = 'Defalt'
     installed_apps = installed_apps.split(',')
     game_list = 'MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
-    game_local = 'None'
+    game_local = game_local.split(',')
     game_selected = 'None'
     launchtime = 1
 
@@ -291,18 +293,26 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
         gamelabel = ui.label('选定项目: ' + str(selected_game or '未指定')) # 初始化标签文本
     with ui.tab_panel('产品库'):
         with ui.column():
-            with ui.card():
-                ui.label('可用实例').style('font-size: 150%; font-weight: 300')
-                ui.label('下面列出了已经适配于LauncherNext的全部程序实例。')
-                ui.label('单击你要使用的项目，然后转到 [启动面板] 。')
-                for game in game_list:
-                    with GameCard() as card:
-                        card.set_game_name(game)
-                        with ui.row():
-                            onclick = lambda game=game: gamelabel.set_text('选定项目: ' + game)  # 使用默认参数
+            with ui.row():
+                with ui.card():
+                    ui.label(f'可用实例 ({len(game_list)})').style('font-size: 150%; font-weight: 300')
+                    ui.label('下面列出了已经适配于LauncherNext的全部程序实例。')
+                    ui.label('单击你要使用的项目，然后转到 [启动面板] 。')
+                    for game in game_list:
+                        with GameCard() as card:
+                            card.set_game_name(game)
+                            with ui.row():
+                                onclick = lambda game=game: gamelabel.set_text('选定项目: ' + game)  # 使用默认参数
+                                ui.label(game)
+                with ui.card() as card:
+                    ui.label(f'已安装 ({len(game_local)})').style('font-size: 150%; font-weight: 300')
+                    ui.label('这是LauncherNext扫描到的安装在默认文件夹下的可用实例。')
+                    ui.label('已经排除了启动器运行必须的依赖项和 '+str(invalid_instances)+' 个无法使用的损坏实例。')
+                    for game in game_local:
+                        with ui.card():
                             ui.label(game)
-            with ui.card():
-                ui.label('系统应用').style('font-size: 150%; font-weight: 300')
+            with ui.card() as card:
+                ui.label(f'系统应用 ({len(installed_apps)})').style('font-size: 150%; font-weight: 300')
                 ui.label('LauncherNext同时还扫描了你电脑上已经安装的应用程序。不过由于其数量较多，我们不建议通过该列表启动这些程序。')
                 ui.label('系统运行时与驱动已剔除。')
                 systemappschk = ui.checkbox('查看系统应用', value=False)
@@ -367,7 +377,6 @@ with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
         on_click=lambda: xlaunch(selected_game) # 使用 lambda 传递选定项
     )
     update_launch_button()  # 初始化按钮状态
-app.on_disconnect(lambda: onstop())
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 def main():
     ui.run(native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)

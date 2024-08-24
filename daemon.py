@@ -9,6 +9,7 @@ import winreg
 
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+cwd = os.getcwd()
 
 def exec(path,cwd=os.getcwd(),shell=False):
     """启动进程并监控其状态"""
@@ -122,3 +123,30 @@ def get_installed_list_win():
     software_string = ", ".join(software_list)
     software_string = runtime_out(software_string)
     return software_string
+
+def scan_instances():
+    """扫描 /apps/ 文件夹下的内容，并更新 game_local 配置项"""
+    apps_dir = os.path.join(cwd, "apps")
+    game_local_list = []
+    invalid_instance = 0
+    exclude_list = ["fastgithub_win-x64","fastgithub_linux-x64","fastgithub_linux-arm64","fastgithub_osx-x64","fastgithub_osx-arm64"]  # 添加排除列表
+
+    if os.path.exists(apps_dir):
+        for item in os.listdir(apps_dir):
+            item_path = os.path.join(apps_dir, item)
+            if os.path.isdir(item_path):
+                # 如果是文件夹，且不在排除列表中，则判断是否存在同名 lnxt 文件
+                if item not in exclude_list:
+                    if os.path.exists(os.path.join(item_path, item + ".lnxt")):
+                        # 如果存在，则记录文件夹名
+                        game_local_list.append(item)
+                    else:
+                        # 如果不存在，则 invalid_instance 加 1，但不记录文件夹名
+                        invalid_instance += 1
+            elif item.endswith(".lnxt"):
+                # 如果是 lnxt 文件，则记录文件名
+                game_local_list.append(item[:-5])  # 去掉 ".lnxt" 后缀
+
+    # 将文件名统计总数并把它们放到一个用逗号分隔的字符串中
+    game_local_str = ",".join(game_local_list)
+    return game_local_str, invalid_instance
