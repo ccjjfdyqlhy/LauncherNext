@@ -5,6 +5,7 @@ import logging
 import os
 import os.path
 import webbrowser
+import daemon
 
 from nicegui import app, ui
 from nicegui.events import ValueChangeEventArguments
@@ -89,13 +90,61 @@ def set_bgc(event: ValueChangeEventArguments):
         with open('lnxt.ini', 'w') as configfile:config.write(configfile)
 
 def select_game(game):
-    logger.info('Game selected: '+game)
+    logger.info('Instance selected: '+game)
     game_selected=game
-    config.set('games', 'game_selected', game)
+    config.set('apps', 'game_selected', game)
     with open('lnxt.ini', 'w') as configfile:config.write(configfile)
     launch_bt.props(remove='disabled')
     launch_bt.set_text('启动 '+game)
+    launch_bt.on('click', lambda:xlaunch(game))
     gamelabel.set_text('选定项目: '+game_selected)
+
+def xlaunch(instance):
+    if not os.path.exists(cwd+'\\apps\\'+instance):
+        logger.warning('Instance folder not found, launching from config file')
+        isappfolder = False
+    else:
+        isappfolder = True
+    logger.info('Getting ready to launch: '+instance)
+    if isappfolder:
+        if os.path.exists(cwd+'\\apps\\'+instance+'\\'+instance+'.lnxt'):
+            logger.info('Reading '+instance+'.lnxt')
+            config.read(cwd+'\\apps\\'+instance+'\\'+instance+'.lnxt')
+        else:
+            logger.error('LauncherNext app config file not found.')
+            logger.error('Launch terminated.')
+            return
+    else:
+        if os.path.exists(cwd+'\\apps\\'+instance+'.lnxt'):
+            logger.info('Reading '+instance+'.lnxt')
+            config.read(cwd+'\\apps\\'+instance+'.lnxt')
+        else:
+            logger.error('LauncherNext app config file not found.')
+            logger.error('Launch terminated.')
+            return
+    
+    appclass = config.get('app', 'class')
+    if appclass == 'exe':
+        appexec = config.get('app', 'exec')
+    elif appclass == 'jar':
+        appexec = 'java -jar '+config.get('app', 'exec')
+    elif appclass == 'minecraft':
+        pass
+        #TODO
+    elif appclass == 'py':
+        try:
+            runtime = config.get('app', 'runtime')
+            vcwd = config.get('app', 'vcwd')
+        except configparser.NoOptionError:
+            logger.error('LauncherNext app config file is missing a required option.')
+            return
+        if runtime == '': runtime = 'python'
+        appexec = runtime+' '+config.get('app', 'exec')
+    logger.info('Launching '+instance)
+    if appclass == 'py':
+        daemon.exec(appexec,vcwd)
+    else:
+        daemon.exec(appexec)
 
 memory = psutil.virtual_memory()
 mtotal=int((memory.total / 1024 ** 2)//1024)
@@ -123,9 +172,9 @@ if os.path.exists('lnxt.ini'):
         bgc_name='Defalt'
     ui.colors(primary=forecolor)
     set_background(bgcolor)
-    game_list= config.get('games', 'game_list').split(',')
-    game_local= config.get('games', 'game_local').split(',')
-    game_selected=config.get('games', 'game_selected')
+    game_list= config.get('apps', 'game_list').split(',')
+    game_local= config.get('apps', 'game_local').split(',')
+    game_selected=config.get('apps', 'game_selected')
     logger.info('Configuration file loaded.')
 else:
     open('lnxt.ini', 'w').close()
@@ -136,7 +185,7 @@ else:
     "forecolor": '#5898D4',
     "bgcolor": "#ffffff"
     }
-    config['games'] = {
+    config['apps'] = {
     "game_list": 'MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact',
     "game_local": 'None',
     "game_selected": 'None'
@@ -166,7 +215,10 @@ if launchtime < 2:
             ui.button('跳过', on_click=dialog.close)
     dialog.open()
 if launchtime % 2 == 0:
-    fg_launcher.launch()
+    if not daemon.is_alive('fastgithub.exe'):
+        fg_launcher.launch()
+    else:
+        logger.info('FastGithub is already running.')
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
@@ -254,6 +306,7 @@ with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
         launch_bt=ui.button('未指定启动项').props('disabled')
     else:
         launch_bt=ui.button(text='启动 '+game_selected)
+        launch_bt.on('click', lambda:xlaunch(game_selected))
 
 app.on_disconnect(lambda: onstop())
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))

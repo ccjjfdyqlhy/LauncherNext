@@ -4,7 +4,7 @@ import utils.fastgithub as fglauncher
 import utils.github_downloader as github_downloader
 from ui import main
 
-test=2
+test=0
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 

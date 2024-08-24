@@ -1,17 +1,20 @@
-import argparse
-import sys
+import sys,logging
 
 # 引入你的代码
 from internetDriver import *
 
-def gdownload():
-    parser = argparse.ArgumentParser(description="下载GitHub仓库的最新发布版本")
-    parser.add_argument("repo", help="GitHub仓库名称，格式为：<作者名>/<仓库名>")
-    parser.add_argument("--token", help="GitHub Token，用于认证下载权限", default=None)
-    args = parser.parse_args()
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-    repo_name = args.repo
-    token = args.token
+def gdownload(repo_name, token=None):
+    """
+    下载GitHub仓库的最新发布版本
+
+    Args:
+        repo_name (str): GitHub仓库名称，格式为：<作者名>/<仓库名>
+        token (str, optional): GitHub Token，用于认证下载权限. Defaults to None.
+    """
+    
     repo_author, repo_name = repo_name.split('/')
 
     try:
@@ -26,8 +29,7 @@ def gdownload():
             if CheckIfZip(abs_path):
                 UnzipToLocation(abs_path, "/downloads/")
 
-        print(f"成功下载{repo_name}仓库的最新发布版本到 /downloads/ 目录。")
+        logger.info(f"成功下载{repo_name}仓库的最新发布版本到 /downloads/ 目录。")
 
     except Exception as e:
-        print(f"下载失败：{e}")
-        sys.exit(1)
+        logger.error(f"下载失败：{e}")
