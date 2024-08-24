@@ -340,7 +340,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             ui.label('4、在 [产品库] 中转到投稿实例，点击 [新投稿] ，并填写相关信息。')
             ui.label('5、等待审核通过。')
             ui.label('6、审核通过后，你的实例将会出现在产品库的可用实例列表中。')
-            ui.label('7、如果你更新了你的实例，只需将其上传到其GitHub仓库的Releases页面。LauncherNext将会自动检测到更新并推送到每位使用者。')
+            ui.label('7、如果你更新了你的实例，只需更改lnxt文件和Release中的版本号，将其上传到其GitHub仓库。LauncherNext将自动将更新推送给每位使用者。')
 
     with ui.tab_panel('产品库'):
         with ui.column():

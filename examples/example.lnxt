@@ -7,6 +7,8 @@ exec = <程序的主入口点路径>
 runtime = <可选的运行时可执行文件路径，仅当class为exe或jar时需要>
 vcwd = <可选的虚拟环境目录，仅当class为py时需要>
 author = <作者名>
+version = <版本号>
+description = <一句话说明你的实例功能>
 
 [config]
 exec = <用户可交互的配置程序路径>
