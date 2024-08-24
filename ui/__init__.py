@@ -41,21 +41,17 @@ class LogElementHandler(logging.Handler):
         except Exception:
             self.handleError(record)
 
-
 class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
         self.on("click", lambda: select_game(self._game_name))
 
-
 def onstop():
     fg_launcher.kill()
     app.shutdown()
 
-
 def set_background(color: str) -> None:
     ui.query('body').style(f'background-color: {color}')
-
 
 def set_fgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
@@ -84,7 +80,6 @@ def set_fgc(event: ValueChangeEventArguments):
         config.set('settings', 'forecolor', '#5898D4')
         with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile: config.write(configfile)
 
-
 def set_bgc(event: ValueChangeEventArguments):
     name = type(event.sender).__name__
     if f'{name}: {event.value}' == 'Radio: Orange':
@@ -96,14 +91,11 @@ def set_bgc(event: ValueChangeEventArguments):
         config.set('settings', 'bgcolor', '#ffffff')
         with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile: config.write(configfile)
 
-
 def set_pyver():
     pyver = pyverin.value()
 
-
 # --- 全局变量存储选定项 ---
 selected_game = None
-
 
 def select_game(game):
     global selected_game  # 使用全局变量
@@ -125,7 +117,6 @@ def update_launch_button():
     else:
         launch_bt.props(remove='disabled')
         launch_bt.set_text('启动 ' + selected_game)
-
 
 def xlaunch(instance):
     if not os.path.exists(cwd + '\\apps\\' + instance):
@@ -150,7 +141,6 @@ def xlaunch(instance):
             logger.error('LauncherNext app config file not found.')
             logger.error('Launch terminated.')
             return
-
     appclass = config.get('app', 'class')
     if appclass == 'exe':
         appexec = config.get('app', 'exec')
@@ -174,7 +164,6 @@ def xlaunch(instance):
     else:
         daemon.exec(appexec)
     logger.info('Launch complete.')
-
 
 memory = psutil.virtual_memory()
 mtotal = int((memory.total / 1024 ** 2) // 1024)
@@ -267,9 +256,7 @@ config['general'] = {
 }
 with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
     config.write(configfile)
-
-logger.info('Initalization Complete.')
-
+logger.info('Initalization complete.')
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():
         ui.label('\u00a0')
@@ -279,7 +266,6 @@ with ui.header().classes(replace='row items-center') as header:
         ui.tab('启动面板')
         ui.tab('产品库')
         ui.tab('启动器设置')
-
 with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     ui.label('活跃线程').style('color: #3288AE; font-size: 150%; font-weight: 500')
     ui.label('没有正在进行的任务。').style('color: #3288AE;')
@@ -287,7 +273,6 @@ with ui.left_drawer().classes('bg-blue-200') as left_drawer:
     handler = LogElementHandler(log)
     logger.addHandler(handler)
     ui.linear_progress()
-
 with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
     with ui.tab_panel('启动面板'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
@@ -311,7 +296,6 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                 for oapp in installed_apps:
                     with ui.card().bind_visibility_from(systemappschk, 'value'):
                         ui.label(oapp)
-
     with ui.tab_panel('启动器设置'):
         ui.label('这里的设置会自动保存。')
         with ui.row():
@@ -339,7 +323,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             ui.label('前景色设置')
             fgcradio = ui.radio(['Defalt', 'Atlantic', 'Forest', 'Deep Ocean', 'Grey'], value=fgc_name,
                                 on_change=set_fgc).props('inline')
-            ui.label('背景色设置(Beta)')
+            ui.label('边框颜色设置')
             bgcradio = ui.radio(['Defalt', 'Orange'], value=bgc_name, on_change=set_bgc).props('inline')
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
@@ -370,10 +354,7 @@ with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
         on_click=lambda: xlaunch(selected_game) # 使用 lambda 传递选定项
     )
     update_launch_button()  # 初始化按钮状态
-
 app.on_disconnect(lambda: onstop())
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
-
-
 def main():
     ui.run(native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)
