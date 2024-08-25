@@ -19,7 +19,7 @@ import utils.fastgithub as fg_launcher
 
 from .installers import *
 
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 forecolor = '#FFFFFF'
 bgcolor = '#ffffff'
 firstlaunch = False
@@ -49,11 +49,11 @@ class LogElementHandler(logging.Handler):
 
             # 根据日志级别显示不同类型的通知
             if record.levelno == logging.INFO:
-                show_notification(msg, "success")
+                    show_notification(msg)
             elif record.levelno == logging.WARNING:
                 show_notification(msg, "warning")
             elif record.levelno >= logging.ERROR:
-                show_notification(msg, "error")
+                show_notification(msg, "negative")
 
         except Exception:
             self.handleError(record)
@@ -63,6 +63,10 @@ class GameCard(ui.card):
     def set_game_name(self, game):
         self._game_name = copy.deepcopy(game)
         self.on("click", lambda: select_game(self._game_name))
+
+
+def ok(string):
+    show_notification(string,type='positive')
 
 
 def submit_instance():
@@ -185,7 +189,8 @@ def launch_config(instance):
     configexec = config.get('config', 'exec')
     try:
         daemon.exec(runtime+' '+configexec, vcwd)
-        logger.info('已启动实例配置界面。')
+        logger.info('已启动实例内置配置器。')
+        ok('已启动实例内置配置器。')
     except FileNotFoundError:
         logger.error('找不到实例配置文件。')
         logger.error('启动已终止。')
@@ -245,7 +250,8 @@ def xlaunch(instance):
             daemon.exec(runtime+' '+appexec, vcwd)
         else:
             daemon.exec(appexec)
-        logger.info('启动完成。')
+        logger.info(f'{instance} 启动成功。')
+        ok('启动完成。')
     except FileNotFoundError:
         logger.error('配置文件中实例可执行文件路径无效。')
         logger.error('启动已终止。')
@@ -406,7 +412,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
             with ui.card():
                 gamelabel = ui.label('选定项目: ' + str(selected_game or '未指定'))
                 typelabel = ui.label('项目类型: ' + str(selected_game_type or '未指定'))
-                ui.button('打开配置页面',on_click=lambda: launch_config(selected_game))
+                ui.button('配置',on_click=lambda: launch_config(selected_game))
             with ui.card():
                 ui.label('LauncherNext本地支持指南').style('font-size: 150%; font-weight: 300')
                 ui.label('1、弄清楚你的项目是exe、jar、minecraft还是python项目。')
