@@ -541,4 +541,4 @@ with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     update_launch_button() 
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 def main():
-    ui.run(port=8000, native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)
+    ui.run(port=7334, native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)
