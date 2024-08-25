@@ -274,7 +274,10 @@ mfree = mtotal - mused
 if os.path.exists('lnxt.ini'):
     game_local,invalid_instances = daemon.scan_instances()
     if sys.platform == 'win32':
-        installed_apps = daemon.get_installed_list_win()
+        installed_apps = ''
+        #installed_apps = daemon.get_installed_list_win()
+    else:
+        installed_apps = ''
     config.read('lnxt.ini', encoding='utf-8-sig')
     config.set('apps', 'installed', installed_apps)
     config.set('apps', 'game_local', game_local)
@@ -314,7 +317,10 @@ if os.path.exists('lnxt.ini'):
     logger.info('已加载配置文件。')
 else:
     if sys.platform == 'win32':
-        installed_apps = daemon.get_installed_list_win()
+        installed_apps = ''
+        #installed_apps = daemon.get_installed_list_win()
+    else:
+        installed_apps = ''
     game_local, invalid_instances = daemon.scan_instances()
     open('lnxt.ini', 'w', encoding='utf-8-sig').close()
     config['general'] = {

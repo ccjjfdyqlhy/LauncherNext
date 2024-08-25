@@ -45,6 +45,7 @@ def install():
             os.chmod(os.path.join(cwd, "apps", "fastgithub_linux-x64", "fastgithub"), 0o777)
 
 def launch():
+    #TODO: Fix MacOS logic: or big parts
     if not os.path.exists(os.path.join(cwd, "apps", "fastgithub_win-x64" or "fastgithub_osx-x64" or "fastgithub_osx-arm64" or "fastgithub_linux-x64" or "fastgithub_linux-arm64")):
         install()
     if platform.system()=="Windows":

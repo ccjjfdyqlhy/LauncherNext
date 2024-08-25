@@ -4,8 +4,10 @@ import threading
 import logging
 import os
 import re
-import psutil
-import winreg
+import sys
+if sys.platform == 'win32':  
+  import psutil
+  import winreg
 
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -60,26 +62,26 @@ def runtime_out(input_string):
     r"^cu.*",
     r"^nv.*",
     r"^Nvidia.*",
-    r"^NVIDIA.*",                # 匹配所有以 "NVIDIA" 开头的项目。
+    r"^NVIDIA.*",               # 匹配所有以 "NVIDIA" 开头的项目。
     r"^CUDA.*",                 # 匹配所有以 "CUDA" 开头的项目。
     r"^CUBLAS.*",               # 匹配所有以 "CUBLAS" 开头的项目。
     r"^CUFFT.*",                # 匹配所有以 "CUFFT" 开头的项目。
     r"^CUPTI.*",                # 匹配所有以 "CUPTI" 开头的项目。
     r"^CURAND.*",               # 匹配所有以 "CURAND" 开头的项目。
-    r"^CUSOLVER.*",              # 匹配所有以 "CUSOLVER" 开头的项目。
-    r"^CUSPARSE.*",              # 匹配所有以 "CUSPARSE" 开头的项目。
-    r"^Microsoft Visual C++.*",     # 匹配所有以 "Microsoft Visual C++" 开头的项目。
+    r"^CUSOLVER.*",             # 匹配所有以 "CUSOLVER" 开头的项目。
+    r"^CUSPARSE.*",             # 匹配所有以 "CUSPARSE" 开头的项目。
+    r"^Microsoft Visual C++.*", # 匹配所有以 "Microsoft Visual C++" 开头的项目。
     r"^NVRTC.*",                # 匹配所有以 "NVRTC" 开头的项目。
     r"^NV.*",                   # 匹配所有以 "NV" 开头的项目（除了已经被以上规则覆盖的项目）。
-    r".*Runtime.*",              # 匹配所有包含 "Runtime" 的项目。
-    r".*Documentation.*",          # 匹配所有包含 "Documentation" 的项目。
-    r".*Profiler.*",             # 匹配所有包含 "Profiler" 的项目。
-    r".*Container.*",            # 匹配所有包含 "Container" 的项目。
-    r".*Suite.*",                # 匹配所有包含 "Suite" 的项目。
-    r".*Driver.*",               # 匹配所有包含 "Driver" 的项目。
-    r".*Installer.*",            # 匹配所有包含 "Installer" 的项目。
-    r"vs_FileTracker_Singleton", # 匹配 "vs_FileTracker_Singleton" 项目。
-    r"\${{arpDisplayName}}"      # 匹配 "${{arpDisplayName}}" 项目。
+    r".*Runtime.*",             # 匹配所有包含 "Runtime" 的项目。
+    r".*Documentation.*",       # 匹配所有包含 "Documentation" 的项目。
+    r".*Profiler.*",            # 匹配所有包含 "Profiler" 的项目。
+    r".*Container.*",           # 匹配所有包含 "Container" 的项目。
+    r".*Suite.*",               # 匹配所有包含 "Suite" 的项目。
+    r".*Driver.*",              # 匹配所有包含 "Driver" 的项目。
+    r".*Installer.*",           # 匹配所有包含 "Installer" 的项目。
+    r"vs_FileTracker_Singleton",# 匹配 "vs_FileTracker_Singleton" 项目。
+    r"\${{arpDisplayName}}"     # 匹配 "${{arpDisplayName}}" 项目。
   ]
 
   input_list = [item.strip() for item in input_string.split(',')]
