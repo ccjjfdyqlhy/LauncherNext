@@ -108,12 +108,40 @@ def select_game(game):
     global selected_game  # 使用全局变量
     logger.info('Instance selected: ' + game)
     selected_game = game
+    if os.path.exists(cwd+'\\apps\\'+game+'\\'+game+'.lnxt'):
+        config.read(cwd+'\\apps\\'+game+'\\'+game+'.lnxt', encoding='utf-8-sig')
+        apptype = config.get('app', 'class')
+        logger.info('App type fetched for '+game+' : ' + apptype)
+    else:
+        logger.warn('File not found in defalt instance folder; using app folder')
+        try:
+            if os.path.exists(cwd+'\\apps\\'+game+'.lnxt'):
+                config.read(cwd+'\\apps\\'+game+'.lnxt', encoding='utf-8-sig')
+                apptype = config.get('app', 'class')
+                logger.info('App type fetched for '+game+' : ' + apptype)
+            else:
+                logger.error('File not found: ' + cwd+'\\apps\\'+game+'.lnxt')
+                apptype = 'unknown'
+        except Exception as e:
+            logger.error('Error reading config file: ' + str(e))
+            apptype = 'unknown'
+    config.read('lnxt.ini', encoding='utf-8-sig')
     config.set('apps', 'game_selected', game)
+    config.set('apps', 'type_selected', apptype)
     with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile: config.write(configfile)
-
-    # 更新按钮和标签
     update_launch_button()
     gamelabel.set_text('选定项目: ' + selected_game)
+    if apptype == 'exe':
+        apptypedsp = 'Win32 可执行程序入口'
+    elif apptype == 'jar':
+        apptypedsp = '打包的 Java 应用程序'
+    elif apptype == 'minecraft':
+        apptypedsp = 'Minecraft 实例'
+    elif apptype == 'py':
+        apptypedsp = 'Python 实例'
+    elif apptype == 'unknown':
+        apptypedsp = '未知'
+    typelabel.set_text('项目类型: ' + apptypedsp)
 
 
 def update_launch_button():
@@ -241,6 +269,7 @@ if os.path.exists('lnxt.ini'):
 
     # 读取上次选定的实例
     game_selected = config.get('apps', 'game_selected')
+    type_selected = config.get('apps', 'type_selected')
     logger.info('Configuration file loaded.')
 else:
     if sys.platform == 'win32':
@@ -258,7 +287,8 @@ else:
         "installed": installed_apps,
         "game_list": 'DSN,MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact',
         "game_local": game_local,
-        "game_selected": 'None'
+        "game_selected": 'None',
+        "type_selected": 'None'
     }
     with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
         config.write(configfile)
@@ -269,13 +299,26 @@ else:
     game_list = 'DSN,MCSA Enchanted,MCSA Enchanted Light,MCSA Multiverse,Minecraft Java,Minecraft Bedrock,Genshin Impact'.split(',')
     game_local = game_local.split(',')
     game_selected = 'None'
+    type_selected = 'None'
     launchtime = 1
 
 # --- 初始化选定项 ---
 if game_selected != 'None' and game_selected in game_list:
     selected_game = game_selected  # 使用配置中读取的值
+    if type_selected == 'exe':
+        apptypedsp = 'Win32 可执行程序入口'
+    elif type_selected == 'jar':
+        apptypedsp = '打包的 Java 应用程序'
+    elif type_selected == 'minecraft':
+        apptypedsp = 'Minecraft 实例'
+    elif type_selected == 'py':
+        apptypedsp = 'Python 实例'
+    elif type_selected == 'unknown':
+        apptypedsp = '未知类型'
+    selected_game_type = apptypedsp
 else:
     selected_game = None  # 或设置为 None 表示未选定
+    selected_game_type = None
 
 if launchtime < 2:
     logger.info('First launch detected.')
@@ -323,6 +366,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
         with ui.column():
             with ui.card():
                 gamelabel = ui.label('选定项目: ' + str(selected_game or '未指定')) # 初始化标签文本
+                typelabel = ui.label('项目类型: ' + str(selected_game_type or '未指定')) # 初始化标签文本
                 ui.button('打开配置页面',on_click=lambda: launch_config(selected_game))
             with ui.card():
                 ui.label('LauncherNext本地支持指南').style('font-size: 150%; font-weight: 300')
@@ -372,29 +416,25 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                         ui.label('你可以在这里把自己的实例提交给LauncherNext的开发者。')
                         ui.label('请确保你的实例已经经过全平台测试并且已经按照启动面板上的要')
                         ui.label('求配置好。')
-                        ui.button('提交实例', on_click=lambda: submit_instance())
+                        ui.button('新投稿', on_click=lambda: submit_instance())
                     with ui.card() as card:
                         ui.label(f'已安装 ({len(game_local)})').style('font-size: 150%; font-weight: 300')
                         ui.label('这是LauncherNext扫描到的安装在默认文件夹下的可用实例。')
                         ui.label('已经排除了启动器运行必须的依赖项和 '+str(invalid_instances)+' 个无法使用的损坏实例。')
                         if len(game_local) == 0:
                             with ui.card():
-                                ui.label('你还没有安装任何实例捏~(￣▽￣)~*')
+                                ui.label('你还没有安装任何实例 ~(￣▽￣)~*')
                         for game in game_local:
                             with ui.card():
                                 ui.label(game)
-    with ui.tab_panel('关于'):
-        ui.label('LauncherNext 是一个开源的 Minecraft 启动器。')
-        ui.label('你可以在这里找到它的源代码：')
-        ui.label('https://github.com/launcher-next/launcher-next')
     with ui.tab_panel('启动器设置'):
         ui.label('这里的设置会自动保存。')
         with ui.row():
             with ui.card():
                 ui.label('LauncherNext').style('color: #6E93D6; font-size: 200%; font-weight: 300')
                 with ui.column():
-                    ui.label('一个基于webUI和Python的轻量级启动器。')
-                    ui.label('当前版本：' + __version__)
+                    ui.label('基于webUI和Python的轻量级启动器，开源软件的自由流通平台。')
+                    ui.label('版本 ' + __version__)
                     ui.label('由 DarkstarXD 和 Allen546 联合开发。')
                     ui.separator()
                     with ui.row():
@@ -404,17 +444,15 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                         ui.button('在 Github 上查看此项目',
                                   on_click=lambda: webbrowser.open('https://github.com/ccjjfdyqlhy/LauncherNext'))
             with ui.card():
-                with ui.column():
-                    ui.label('账户').style('font-size: 150%; font-weight: 300')
-                    username = ui.input('用户名')
-                    password = ui.input('密码', password=True, password_toggle_button=True)
-                    ui.button('登录')
+                ui.label('登录').style('font-size: 150%; font-weight: 300')
+                ui.label('使用GitHub账号登录到LauncherNext。')
+                ui.chip('OAuth Login with GitHub', icon='launch', color='indigo-3')
         with ui.card():
-            ui.label('主题设置').style('font-size: 150%; font-weight: 300')
+            ui.label('个性化').style('font-size: 150%; font-weight: 300')
             ui.label('前景色设置')
             fgcradio = ui.radio(['Defalt', 'Atlantic', 'Forest', 'Deep Ocean', 'Grey'], value=fgc_name,
                                 on_change=set_fgc).props('inline')
-            ui.label('背景色设置(Beta)')
+            ui.label('边框颜色设置')
             bgcradio = ui.radio(['Defalt', 'Orange'], value=bgc_name, on_change=set_bgc).props('inline')
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
@@ -447,4 +485,4 @@ with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     update_launch_button()  # 初始化按钮状态
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 def main():
-    ui.run(native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)
+    ui.run(port=8000, native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)
