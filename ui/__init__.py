@@ -27,11 +27,15 @@ selected_game = None
 cwd = os.getcwd()
 app.native.window_args['resizable'] = False
 app.native.start_args['debug'] = False
-app.add_static_files('/static', os.path.join(cwd, "static"))  # Use os.path.join instead of "+"
+app.add_static_files('/static', os.path.join(cwd, "static"))
 config = configparser.ConfigParser()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+show_notifications = True
 
+def show_notification(message, type="success"):
+    if show_notifications:
+        ui.notify(message, type=type, position='bottom-right')
 
 class LogElementHandler(logging.Handler):
     def __init__(self, element: ui.log, level: int = logging.NOTSET) -> None:
@@ -42,6 +46,15 @@ class LogElementHandler(logging.Handler):
         try:
             msg = self.format(record)
             self.element.push(msg)
+
+            # 根据日志级别显示不同类型的通知
+            if record.levelno == logging.INFO:
+                show_notification(msg, "success")
+            elif record.levelno == logging.WARNING:
+                show_notification(msg, "warning")
+            elif record.levelno >= logging.ERROR:
+                show_notification(msg, "error")
+
         except Exception:
             self.handleError(record)
 
@@ -105,25 +118,25 @@ def set_pyver():
 
 
 def select_game(game):
-    global selected_game  # 使用全局变量
-    logger.info('Instance selected: ' + game)
+    global selected_game 
+    logger.info(f'已选择实例: {game}')
     selected_game = game
     if os.path.exists(cwd+'\\apps\\'+game+'\\'+game+'.lnxt'):
         config.read(cwd+'\\apps\\'+game+'\\'+game+'.lnxt', encoding='utf-8-sig')
         apptype = config.get('app', 'class')
-        logger.info('App type fetched for '+game+' : ' + apptype)
+        logger.info(f'已获取 {game} 的应用程序类型: {apptype}')
     else:
-        logger.warn('File not found in defalt instance folder; using app folder')
+        logger.warning('在默认实例文件夹中找不到文件; 正在使用应用程序文件夹')
         try:
             if os.path.exists(cwd+'\\apps\\'+game+'.lnxt'):
                 config.read(cwd+'\\apps\\'+game+'.lnxt', encoding='utf-8-sig')
                 apptype = config.get('app', 'class')
-                logger.info('App type fetched for '+game+' : ' + apptype)
+                logger.info(f'已获取 {game} 的应用程序类型: {apptype}')
             else:
-                logger.error('File not found: ' + cwd+'\\apps\\'+game+'.lnxt')
+                logger.error(f'找不到文件: {cwd}\\apps\\{game}.lnxt')
                 apptype = 'unknown'
         except Exception as e:
-            logger.error('Error reading config file: ' + str(e))
+            logger.error(f'读取配置文件时出错: {str(e)}')
             apptype = 'unknown'
     config.read('lnxt.ini', encoding='utf-8-sig')
     config.set('apps', 'game_selected', game)
@@ -141,13 +154,15 @@ def select_game(game):
         apptypedsp = 'Python 实例'
     elif apptype == 'unknown':
         apptypedsp = '未知'
+    else:
+        apptypedsp = '尚未支持的类型 '+apptype
     typelabel.set_text('项目类型: ' + apptypedsp)
 
 
 def update_launch_button():
-    global selected_game # 使用全局变量
+    global selected_game
     if selected_game is None:
-        launch_bt.props(remove='disabled') # 移除 disabled 属性
+        launch_bt.props(remove='disabled')
         launch_bt.set_text('未指定启动项')
     else:
         launch_bt.props(remove='disabled')
@@ -156,48 +171,48 @@ def update_launch_button():
 
 def launch_config(instance):
     if selected_game is None: 
-        logger.error('No instance selected')
+        logger.error('未选择任何实例')
         return
     if os.path.exists(cwd + '\\apps\\' + instance + '.lnxt'):
-            logger.info('Reading ' + instance + '.lnxt')
+            logger.info(f'正在读取 {instance}.lnxt')
             config.read(cwd + '\\apps\\' + instance + '.lnxt')
     else:
-            logger.error('LauncherNext app config file not found.')
-            logger.error('Launch terminated.')
+            logger.error('找不到 LauncherNext 应用程序配置文件。')
+            logger.error('启动已终止。')
             return
     runtime = config.get('app', 'runtime')
     vcwd = config.get('app', 'vcwd')
     configexec = config.get('config', 'exec')
     try:
         daemon.exec(runtime+' '+configexec, vcwd)
-        logger.info('Instance config interface launched.')
+        logger.info('已启动实例配置界面。')
     except FileNotFoundError:
-        logger.error('Instance config file not found.')
-        logger.error('Launch terminated.')
+        logger.error('找不到实例配置文件。')
+        logger.error('启动已终止。')
 
 def xlaunch(instance):
-    if instance == None: logger.error('No instance selected');return
+    if instance == None: logger.error('未选择任何实例');return
     if not os.path.exists(cwd + '\\apps\\' + instance):
-        logger.warning('Instance folder not found, launching from config file')
+        logger.warning('找不到实例文件夹，正从配置文件启动')
         isappfolder = False
     else:
         isappfolder = True
-    logger.info('Getting ready to launch: ' + instance)
+    logger.info(f'准备启动: {instance}')
     if isappfolder:
         if os.path.exists(cwd + '\\apps\\' + instance + '\\' + instance + '.lnxt'):
-            logger.info('Reading ' + instance + '.lnxt')
+            logger.info(f'正在读取 {instance}.lnxt')
             config.read(cwd + '\\apps\\' + instance + '\\' + instance + '.lnxt')
         else:
-            logger.error('LauncherNext app config file not found.')
-            logger.error('Launch terminated.')
+            logger.error('找不到 LauncherNext 应用程序配置文件。')
+            logger.error('启动已终止。')
             return
     else:
         if os.path.exists(cwd + '\\apps\\' + instance + '.lnxt'):
-            logger.info('Reading ' + instance + '.lnxt')
+            logger.info(f'正在读取 {instance}.lnxt')
             config.read(cwd + '\\apps\\' + instance + '.lnxt')
         else:
-            logger.error('LauncherNext app config file not found.')
-            logger.error('Launch terminated.')
+            logger.error('找不到 LauncherNext 应用程序配置文件。')
+            logger.error('启动已终止。')
             return
     appclass = config.get('app', 'class')
     if appclass == 'exe':
@@ -213,20 +228,36 @@ def xlaunch(instance):
             vcwd = config.get('app', 'vcwd')
             appexec = config.get('app', 'exec')
         except configparser.NoOptionError:
-            logger.error('LauncherNext app config file is missing a required option.')
+            logger.error('LauncherNext 应用程序配置文件缺少必需的选项。')
             return
         if runtime == '': runtime = 'python'
-    logger.info('Launching ' + instance)
+    elif appclass == 'unknown':
+        logger.error('未知的应用程序类别。')
+        logger.error('启动已终止。')
+        return
+    else:
+        logger.error('尚不支持的应用程序类别。')
+        logger.error('启动已终止。')
+        return
+    logger.info(f'正在启动 {instance}')
     try:
         if appclass == 'py':
             daemon.exec(runtime+' '+appexec, vcwd)
         else:
             daemon.exec(appexec)
-        logger.info('Launch complete.')
+        logger.info('启动完成。')
     except FileNotFoundError:
-        logger.error('Invalid instance executable route in config file.')
-        logger.error('Launch terminated.')
+        logger.error('配置文件中实例可执行文件路径无效。')
+        logger.error('启动已终止。')
         return
+
+# --- 函数用于切换是否显示通知 ---
+def toggle_notifications(event: ValueChangeEventArguments):
+    global show_notifications
+    show_notifications = event.value
+    config.set('settings', 'show_notifications', str(show_notifications))
+    with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
+        config.write(configfile)
 
 
 memory = psutil.virtual_memory()
@@ -247,6 +278,10 @@ if os.path.exists('lnxt.ini'):
     launchtime = int(config.get('general', 'launch'))
     forecolor = config.get('settings', 'forecolor')
     bgcolor = config.get('settings', 'bgcolor')
+
+    # 读取是否显示通知的设置
+    show_notifications = config.getboolean('settings', 'show_notifications', fallback=True)
+
     if forecolor == '#555':
         fgc_name = 'Grey'
     elif forecolor == '#3288AE':
@@ -270,7 +305,7 @@ if os.path.exists('lnxt.ini'):
     # 读取上次选定的实例
     game_selected = config.get('apps', 'game_selected')
     type_selected = config.get('apps', 'type_selected')
-    logger.info('Configuration file loaded.')
+    logger.info('已加载配置文件。')
 else:
     if sys.platform == 'win32':
         installed_apps = daemon.get_installed_list_win()
@@ -281,7 +316,9 @@ else:
     }
     config['settings'] = {
         "forecolor": '#5898D4',
-        "bgcolor": "#ffffff"
+        "bgcolor": "#ffffff",
+        # 默认显示通知
+        "show_notifications": "True"
     }
     config['apps'] = {
         "installed": installed_apps,
@@ -292,7 +329,7 @@ else:
     }
     with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
         config.write(configfile)
-    logger.info('New configuration file created.')
+    logger.info('已创建新的配置文件。')
     fgc_name = 'Defalt'
     bgc_name = 'Defalt'
     installed_apps = installed_apps.split(',')
@@ -304,7 +341,7 @@ else:
 
 # --- 初始化选定项 ---
 if game_selected != 'None' and game_selected in game_list:
-    selected_game = game_selected  # 使用配置中读取的值
+    selected_game = game_selected
     if type_selected == 'exe':
         apptypedsp = 'Win32 可执行程序入口'
     elif type_selected == 'jar':
@@ -315,13 +352,15 @@ if game_selected != 'None' and game_selected in game_list:
         apptypedsp = 'Python 实例'
     elif type_selected == 'unknown':
         apptypedsp = '未知类型'
+    else:
+        apptypedsp = '尚未支持的类型 '+type_selected
     selected_game_type = apptypedsp
 else:
-    selected_game = None  # 或设置为 None 表示未选定
+    selected_game = None 
     selected_game_type = None
 
 if launchtime < 2:
-    logger.info('First launch detected.')
+    logger.info('检测到首次启动。')
     with ui.dialog() as dialog, ui.card():
         ui.label('欢迎!').style('color: #6E93D6; font-size: 200%; font-weight: 300')
         ui.label('LauncherNext 是一个基于 webUI 设计的轻量级应用启动器。')
@@ -336,14 +375,14 @@ if launchtime % 2 == 0:
     if not daemon.is_alive('fastgithub.exe'):
         fg_launcher.launch()
     else:
-        logger.info('FastGithub is already running.')
+        logger.info('FastGithub 已在运行。')
 launchtime = launchtime + 1
 config['general'] = {
     "launch": launchtime
 }
 with open('lnxt.ini', 'w', encoding='utf-8-sig') as configfile:
     config.write(configfile)
-logger.info('Initalization complete.')
+logger.info('初始化完成。')
 with ui.header().classes(replace='row items-center') as header:
     with ui.row():
         ui.label('\u00a0')
@@ -365,8 +404,8 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
         ui.label('启动面板').style('color: #6E93D6; font-size: 200%; font-weight: 300')
         with ui.column():
             with ui.card():
-                gamelabel = ui.label('选定项目: ' + str(selected_game or '未指定')) # 初始化标签文本
-                typelabel = ui.label('项目类型: ' + str(selected_game_type or '未指定')) # 初始化标签文本
+                gamelabel = ui.label('选定项目: ' + str(selected_game or '未指定'))
+                typelabel = ui.label('项目类型: ' + str(selected_game_type or '未指定'))
                 ui.button('打开配置页面',on_click=lambda: launch_config(selected_game))
             with ui.card():
                 ui.label('LauncherNext本地支持指南').style('font-size: 150%; font-weight: 300')
@@ -398,7 +437,7 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                             with GameCard() as card:
                                 card.set_game_name(game)
                                 with ui.row():
-                                    onclick = lambda game=game: gamelabel.set_text('选定项目: ' + game)  # 使用默认参数
+                                    onclick = lambda game=game: gamelabel.set_text('选定项目: ' + game)
                                     ui.label(game)
                     with ui.card() as card:
                         ui.label(f'系统应用 ({len(installed_apps)})').style('font-size: 150%; font-weight: 300')
@@ -454,10 +493,15 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
                                 on_change=set_fgc).props('inline')
             ui.label('边框颜色设置')
             bgcradio = ui.radio(['Defalt', 'Orange'], value=bgc_name, on_change=set_bgc).props('inline')
+
+        # --- 添加通知开关 ---
+        with ui.card():
+            ui.label('启动器设置').style('font-size: 150%; font-weight: 300')
+            notification_switch = ui.switch('启用事件显示队列', value=show_notifications, on_change=toggle_notifications)
+
         with ui.card():
             ui.label('实例设置').style('font-size: 150%; font-weight: 300')
             ui.label('Python类').style('font-size: 125%')
-            # TODO
             with ui.column():
                 with ui.row():
                     pyverin = ui.input("默认Python运行时:")
@@ -480,9 +524,9 @@ with ui.tab_panels(tabs, value='启动面板').classes('w-full'):
 
 with ui.page_sticky(position='bottom-right', x_offset=20, y_offset=20):
     launch_bt = ui.button(
-        on_click=lambda: xlaunch(selected_game) # 使用 lambda 传递选定项
+        on_click=lambda: xlaunch(selected_game)
     )
-    update_launch_button()  # 初始化按钮状态
+    update_launch_button() 
 ui.context.client.on_disconnect(lambda: logger.removeHandler(handler))
 def main():
     ui.run(port=8000, native=True, window_size=(1280, 720), title='LauncherNext Interface', reload=False)

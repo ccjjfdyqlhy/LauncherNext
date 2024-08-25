@@ -15,18 +15,18 @@ def exec(path,cwd=os.getcwd(),shell=False):
     """启动进程并监控其状态"""
     try:
         process = subprocess.Popen('cmd /c start '+path,shell=shell,cwd=cwd)
-        logger.info(f"Executable {path} launched. PID: {process.pid}")
+        logger.info(f"实例入口点 {path} 已启动。 追踪PID: {process.pid}")
         # 创建线程监控进程状态
         def monitor_process(process, path):
             while True:
                 if process.poll() is not None:
-                    logger.info(f"Process {path} terminated.")
+                    logger.info(f"实例进程 {path} 已外部终止。")
                     break
                 time.sleep(1)
         monitor_thread = threading.Thread(target=monitor_process, args=(process, path))
         monitor_thread.start()
     except FileNotFoundError:
-        logger.error(f"'{path}' does not exist.")
+        logger.error(f"'{path}' 不存在。")
         raise FileNotFoundError(f"'{path}' does not exist.")
 
 def is_alive(process_name):

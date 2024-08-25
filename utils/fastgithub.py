@@ -10,7 +10,7 @@ from internetDriver import *
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 cwd=os.getcwd()
-logger.info("Running On "+platform.system()+platform.machine())
+logger.info("系统平台 "+platform.system()+' '+platform.machine())
 
 def unzip(ver="win-x64"):
     UnzipToLocation(os.path.join(cwd, "FastGithub-2.1.4", "fastgithub_"+ver+".zip"), os.path.join(cwd, "apps"),False)
