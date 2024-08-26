@@ -8,8 +8,12 @@ import logging
 import os
 import os.path
 import webbrowser
-import daemon
 import sys
+try:
+    import daemon
+except ImportError:
+    print('请从主入口点启动LauncherNext。')
+    sys.exit(1)
 
 from nicegui import app, ui
 from nicegui.events import ValueChangeEventArguments
@@ -188,12 +192,18 @@ def launch_config(instance):
     vcwd = config.get('app', 'vcwd')
     configexec = config.get('config', 'exec')
     try:
-        daemon.exec(runtime+' '+configexec, vcwd)
+        tlaunch(runtime+' '+configexec, vcwd)
         logger.info('已启动实例内置配置器。')
         ok('已启动实例内置配置器。')
     except FileNotFoundError:
         logger.error('找不到实例配置文件。')
         logger.error('启动已终止。')
+
+
+def tlaunch(command, vcwd):
+    thread = threading.Thread(target=daemon.run_in_event_loop, args=(daemon.exec_and_capture_output(command,cwd=vcwd),))
+    thread.start()
+
 
 def xlaunch(instance):
     if instance == None: logger.error('未选择任何实例');return

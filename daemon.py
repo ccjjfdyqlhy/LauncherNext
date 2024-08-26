@@ -5,13 +5,77 @@ import logging
 import os
 import re
 import sys
-if sys.platform == 'win32':  
+import asyncio
+from sys import platform
+
+if platform == 'win32':  
   import psutil
   import winreg
 
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 cwd = os.getcwd()
+
+
+async def read_stream(stream, log_function):
+    """异步读取流数据并打印"""
+    while True:
+        line = await stream.readline()
+        if not line:
+            break
+        log_function(line.decode().rstrip())
+
+async def exec_and_capture_output(path, cwd=os.getcwd(), shell=False):
+    """
+    启动进程，监控其状态，并捕获终端输出（异步方式）。
+
+    Args:
+        path: 可执行文件的路径。
+        cwd: 工作目录，默认为当前工作目录。
+        shell: 是否使用 shell 执行命令，默认为 False。
+    """
+    try:
+        if platform == 'win32':
+            process = await asyncio.create_subprocess_exec(
+                *path.split(),
+                shell=shell,
+                cwd=cwd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+        elif platform == 'darwin':  # macOS
+            process = await asyncio.create_subprocess_exec(
+                'open', '-a', 'Terminal', '--args', path,
+                cwd=cwd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+        else:
+            raise OSError("Unsupported operating system.")
+
+        logger.info(f"实例入口点 {path} 已启动。 追踪PID: {process.pid}")
+
+        # 异步读取 stdout 和 stderr
+        await asyncio.gather(
+            read_stream(process.stdout, logger.info),
+            read_stream(process.stderr, logger.error),
+        )
+
+        await process.wait()
+        logger.info(f"实例进程 {path} 已外部终止。")
+
+    except FileNotFoundError:
+        logger.error(f"'{path}' 不存在。")
+        raise FileNotFoundError(f"'{path}' does not exist.")
+
+def run_in_event_loop(coro):
+    """在新线程的 event loop 中运行异步函数"""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        loop.run_until_complete(coro)
+    finally:
+        loop.close()
 
 def exec(path,cwd=os.getcwd(),shell=False):
     """启动进程并监控其状态"""
@@ -30,6 +94,27 @@ def exec(path,cwd=os.getcwd(),shell=False):
     except FileNotFoundError:
         logger.error(f"'{path}' 不存在。")
         raise FileNotFoundError(f"'{path}' does not exist.")
+
+def run_commands(*commands):
+    """
+    在同一个终端实例中按顺序执行多条命令，并保留历史记录，输出所有命令的输出和错误信息。
+
+    Args:
+        *commands: 要执行的命令，每个命令都是一个字符串。
+    """
+    if platform == 'win32':
+       shell = subprocess.Popen("cmd.exe", stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True)
+    elif platform == 'Darwin':
+        shell = subprocess.Popen(["/bin/bash"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    with shell as master_process:
+        for i, command in enumerate(commands):
+            # 将每个命令的输出和错误信息都写入主进程的标准输入
+            master_process.stdin.write(f"{command}\n")
+        # 关闭主进程的标准输入，以便读取所有输出
+        master_process.stdin.close()
+        # 读取并打印所有命令的输出
+        output = master_process.stdout.read()
+        print(output)
 
 def is_alive(process_name):
   """检查给定名称的进程是否正在运行。
