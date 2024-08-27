@@ -8,4 +8,5 @@
 /dist/*
 lnxt.ini
 DSproduct.cfg
+LauncherNext.bat
 .venv/*
